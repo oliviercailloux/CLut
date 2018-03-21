@@ -1,0 +1,61 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+\documentclass[version=last, pagesize, twoside=off, bibliography=totoc, DIV=calc, fontsize=14pt, a4paper, french, english]{scrartcl}
+%need to tell arXiv to process with pdflatex with the following line. Then, "Package hyperref Message: Driver (autodetected): hpdftex." Otherwise, urls don’t break, which messes the bibliography. See how to solve this (using latex?)
+\pdfoutput=1
+\input{preamble/packages}
+\input{preamble/math_basics}
+\input{preamble/math_mine}
+\input{preamble/redac}
+\input{preamble/draw}
+\input{preamble/acronyms}
+
+%\setbeamertemplate{headline}[singleline]
+
+\begin{document}
+\title{%
+	Learning value functions collaboratively%
+}
+\author{Florian Yger}
+\author{Olivier Cailloux}
+\affil{Université Paris-Dauphine, PSL Research University, CNRS, LAMSADE, 75016 PARIS, FRANCE\\
+	\href{mailto:olivier.cailloux@dauphine.fr}{olivier.cailloux@dauphine.fr}
+}
+\makeatletter
+	\hypersetup{
+		pdfsubject={collaborative learning},
+		pdfkeywords={machine learning},
+		pdfauthor={Olivier Cailloux, Florian Yger}
+	}
+\makeatother
+\maketitle
+
+\section{Overview}
+Assume we have a set of users represented by $I$ of size $m \in \N$, a set of items represented by $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $[1, 5]$. We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$, and of the items in a vector space $B$ of dimension $d_B \in \N$: user $i$ is described by $a_i \in A$, and item $j$ is described by $b_j \in B$.
+
+As in classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
+
+However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
+
+We assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
+
+We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
+\begin{equation}
+\min_{U, V, W_A, W_B} \sum_{(i, j) \in O} L(r_{ij}, u_i^T v_j) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
+\end{equation}
+
+\section{Data set}
+We experiment using the Sushi data set (ref…)
+
+Here $J$ is a set of $100$ sushi types \footnote{$X^*=X_B$ in the original notation.}. The original authors collected the sushi from the menu of 25 restaurants, computed the frequency of each sushi type occurring on a menu, and took the $100$ most frequent. Write $P_J$ the frequency (thus a multiple of $0.04$).
+
+Write $J_T \subset J$ the $10$ most frequent sushi types \footnote{$X_A$}.
+
+The set $I$ has cardinal $m = 5000$. The authors drew randomly a set of 10 sushi types among $J$, for each user $i$, according to the distribution $P_J$. Let us denote this by $J_i \subset J$ \footnote{$X^B_i$}.
+
+The authors obtained, for each user $i$ in $I$, three preferential informations. First, they collected a preference ordering over the sushi types from $J_S$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering \footnote{$O^A_i$} (“top” designates the fact that the ordering is over the top 10 most frequent sushi types). Second, they collected a rating, in $[1, 5]$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user think each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ \footnote{$O^B_i$} (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
+
+\section{References}
+%\bibliography{mybib}
+
+\end{document}
+
