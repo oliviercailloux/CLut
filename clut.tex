@@ -30,23 +30,43 @@
 \maketitle
 
 \section{Overview}
-Assume we have a set of users represented by $I$ of size $m \in \N$, a set of items represented by $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\llbracket{}1, 5\rrbracket$ (throughout the article, this notation designates intervals in the integers). We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$, and of the items in a vector space $B$ of dimension $d_B \in \N$: user $i$ is described by $a_i \in A$, and item $j$ is described by $b_j \in B$.
+Assume we have a set of users represented by $I$ of size $m \in \N$, a set of items represented by $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\intvl{1, 5}$ (throughout the article, this notation designates intervals in the integers). We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$, and of the items in a vector space $B$ of dimension $d_B \in \N$: user $i$ is described by $a_i \in A$, and item $j$ is described by $b_j \in B$.
 
 In classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
 
 However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
 
-We could define $u_i = W_A a_i$ and $v_j = W_B b_j$ and obtain $r_{ij} \approx a_i^T (W_A^T W_B) b_j$, thus we could optimize by searching for the best $(W_A^T W_B)$. But as this could be too constrained, we will also try to relax these constraints and search for good representation that takes into account that $u_i$ should be close to $W_A a_i$, but not necessarily equal.
+We could define $u_i = W_A a_i$ and $v_j = W_B b_j$ and obtain $r_{ij} \approx a_i^T (W_A^T W_B) b_j$, thus we could optimize by searching for the best $(W_A^T W_B)$. But as this could be too constrained, we will also try to relax these constraints and search for a representation that takes into account that $u_i$ should be close to $W_A a_i$, but not necessarily equal.
 
-We assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
+\subsection{Predict ratings}
+We could want to check whether we are able to predict the right ratings. In that case, we would assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
 
-We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
+We would want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
 \begin{equation}
 \min_{U, V, W_A, W_B} \sum_{(i, j) \in O} L(r_{ij}, u_i^T v_j) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
 \end{equation}
 
-\subsection{Explainable dimensions}
-Here we explain that the $W_A$ stuff may be used to determine only a subset $k' < k$ of dimensions, and compare to the above approach with relaxation over the $k$ dimensions.
+\subsection{Predict orders}
+We are interested in comparing our predictions to orderings (because that’s what we have underhand).
+
+We assume we are given loss function $L$, that compares preorders (transitive and reflexive binary relations), and $L_I$ and $L_J$, as above. We assume we have a preorder $≥_i$ for each user indicating her true preference over some pairs of items among $J$.
+
+We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
+\begin{equation}
+\min_{U, V, W_A, W_B} \sum_{i \in i} L(≥_i, \set{(v_j, v_{j'}) \suchthat u_i^T v_j ≥ u_i^T v_{j'}}) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
+\end{equation}
+
+\section{Double-strategy}
+In the double-strategy, we use different dimensions: $k = k^W1 + k^u = k^{W2} + k^v$.
+The matrix $W_A$ has size $(k^{W1}, d_A)$ and $U$ has size $(m, k^u)$. $W_B$ has size $(k^{W2}, d_B)$ and $V$ has size $(k^v, n)$. $r_{ij} = \mu_i^T \nu_j$ where $\mu_i$ is the $k$-dimensional vector composed of $W_A a_i$ then $u_i$ and $\nu_j$ is composed of $W_B b_i$ then $v_j$.
+
+We should compare this approach to the more classical one.
+(Theoretical question to study: difference between this and the above approach?)
+
+\section{Reducing parameters}
+The matrix $W_B$ could be constrained to having mostly zeroes, to make sure that indeed the attributes of the items are used in their $\mu$-vectorial description. We could even take $\mu = d_B$ and make $W_B$ a diagonal matrix. (Is there any benefit not to do so?)
+
+This suggests the following simple approach: concatenate $b_j$ to $v_j$ to obtain $\nu_j$. Don’t use $W_B$ (or set it to identity). Use $W_A a_i$ of size $k = d_B + k^v$; obtain also $u_i$ of size $k$, add both with a big weight on the first one, and on the first $d_B$ components, if we want to explain.
 
 \section{Data set}
 We experiment using the Sushi data set (ref…)
@@ -57,9 +77,11 @@ Write $J_\text{top} \subset J$ the $10$ most frequent sushi types \footnote{$X_A
 
 The set $I$ has cardinal $m = 5000$. The authors drew randomly a set of 10 sushi types among $J$, for each user $i$, according to the distribution $P_J$. Let us denote this by $J_i \subset J$ \footnote{$X^B_i$}.
 
-The authors obtained, for each user $i$ in $I$, three preferential informations. First, they collected a preference ordering over the sushi types from $J_\text{top}$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering \footnote{$O^A_i$} (“top” designates the fact that the ordering is over the 10 most frequent sushi types). Second, they collected a rating, in $\llbracket 1, 5\rrbracket$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user think each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ \footnote{$O^B_i$} (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
+The authors obtained, for each user $i$ in $I$, three preferential informations, defined as strict partial orders (transitive, asymmetric binary relations). First, they collected a preference ordering over the sushi types from $J_\text{top}$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering \footnote{$O^A_i$} (“top” designates the fact that the ordering is over the 10 most frequent sushi types). Second, they collected a rating, in $\intvl{1, 5}$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user think each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ \footnote{$O^B_i$} (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
 
 Users are described in a space $A$ comprising the attributes $\{$gender, age category, origin-prefecture, origin-region, origin-east/west (binary), current-region, current-east/west (binary), origin-prefecture$\}$. Items are described in a space $B$ comprising the attributes $\{$group, heaviness/oiliness in taste (in $[0, 4]$), frequency of eating (in $[0, 3]$), normalized price (in $[0, 1]$), $P_J(j)$$\}$.
+
+We summarize the preference of $i$ as follows. The ratings over $J_i$ are transformed to preorders $≥^\text{rating}_i$ that tolerate ex-æquos, in the obvious way (better ratings indicate preference). We then merge, for each user $i$, all preferential information, considering contradictions as indicating indifference, and obtain a preorder $≥_i = [≥^\text{rating}_i ∪ >^\text{top}_i ∪ >^\text{indiv}_i]$, where the brackets designate taking the transitive closure and adding the identity relation (to obtain reflexivity). For example, if $>^\text{top}_i$ represents the ordering $(j_1 > j_2 > j_3)$ and $>^\text{indiv}_i$ represents $(j_6 > j_3 > j_4 > j_2)$ and $≥^\text{rating}_i = \emptyset$, then $≥_i$ considers $j_1$ and $j_6$ as strictly preferred to $j_2$ to $j_4$, $j_2$ to $j_4$ ex-æquos, and $j_1$ incomparable to $j_6$.
 
 \section{References}
 %\bibliography{mybib}
