@@ -57,18 +57,20 @@ We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
 \end{equation}
 
 \section{Double-strategy}
-In the double-strategy, we use different dimensions: $k = k^W1 + k^u = k^{W2} + k^v$.
-The matrix $W_A$ has size $(k^{W1}, d_A)$ and $U$ has size $(m, k^u)$. $W_B$ has size $(k^{W2}, d_B)$ and $V$ has size $(k^v, n)$. $r_{ij} = \mu_i^T \nu_j$ where $\mu_i$ is the $k$-dimensional vector composed of $W_A a_i$ then $u_i$ and $\nu_j$ is composed of $W_B b_i$ then $v_j$.
+In the double-strategy, we use different dimensions: $k = d_{A'} + d_U = d_{B'} + d_V$.
+The matrix $W_A$ has size $(d_{A'}, d_A)$ and $U$ has size $(m, d_U)$. $W_B$ has size $(d_{B'}, d_B)$ and $V$ has size $(d_V, n)$. $r_{ij} = \mu_i^T \nu_j$ where $\mu_i$ is the $k$-dimensional vector composed of $W_A a_i$ then $u_i$ and $\nu_j$ is composed of $W_B b_j$ then $v_j$.
 
 We should compare this approach to the more classical one.
-(Theoretical question to study: difference between this and the above approach?)
 
-\section{Reducing parameters}
-The matrix $W_B$ could be constrained to having mostly zeroes, to make sure that indeed the attributes of the items are used in their $\mu$-vectorial description. We could even take $\mu = d_B$ and make $W_B$ a diagonal matrix. (Is there any benefit not to do so?)
+\section{Using raw item descriptions}
+The matrix $W_B$ could be constrained to having mostly zeroes, to make sure that indeed the attributes of the items ($b_j$) are used in their $\mu$-vectorial description. We could even take $d_{B'} = d_B$ and take $W_B$ equal to identity. (Is there any benefit not to do so?)
 
-This suggests the following simple approach: concatenate $b_j$ to $v_j$ to obtain $\nu_j$. Don’t use $W_B$ (or set it to identity). Use $W_A a_i$ of size $k = d_B + k^v$; obtain also $u_i$ of size $k$, add both with a big weight on the first one, and on the first $d_B$ components, if we want to explain.
+This suggests the following simple approach: concatenate $b_j$ to $v_j$ to obtain $\nu_j$. Don’t use $W_B$. Obtain $\mu_i$ of size $k = d_B + d_V$, using $W_A a_i$ as its first components.
 
-\section{Data set}
+\section{Factorization machines}
+We should compare (theoretically or experimentally) our approach to factorization machines.
+
+\section{Data set: Sushi}
 We experiment using the Sushi data set (ref…)
 
 Here $J$ is a set of $100$ sushi types \footnote{$X^*=X_B$ in the original notation.}. The original authors collected the sushi from the menu of 25 restaurants, computed the frequency of each sushi type occurring on a menu, and took the $100$ most frequent. Write $P_J$ the frequency (thus a multiple of $1/25$).
