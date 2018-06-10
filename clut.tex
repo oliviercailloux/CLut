@@ -30,7 +30,8 @@
 \maketitle
 
 \section{Goal: justifiable recommendations}
-Recommender systems aim at recommending some item as most appropriate for a given user. In this article, we introduce the concept of justifiable recommendations. Those are recommendations that are accompanied with explicit principles whose acceptance is sufficient to justify the recommendation. We make this definition precise by relating it to the “deliberated” preference of the user; and describe an hypothetic situation where such recommendations could be obtained using classical machine learning techniques.
+Recommender systems aim at recommending some item as most appropriate for a given user.
+In this article, we introduce the concept of justifiable recommendations. Those are recommendations that are accompanied with explicit principles whose acceptance is sufficient to justify the recommendation. We make this definition precise by relating it to the “deliberated” preference of the user; and describe an hypothetic situation where such recommendations could be obtained using classical machine learning techniques.
 
 We start from a setting that is classical in the field of collaborative filtering. A set of items is defined among which a user wants to choose. The system aims at recommending an item to the user on the basis of which items the user or “similar” users have appreciated in the past.
 
@@ -49,7 +50,7 @@ By contrast, a recommendation task is not justifiable (or, more precisely, it is
 When a recommendation task is justifiable, particularly interesting links between machine learning and decision theory can be developed. 
 One interest of providing recommendations based on decision theory is that it then rests on principles usually considered sound, and in any case fully explicited.
 
-\subsection{Prediction ≠ justification}
+\subsection{Prediction of deliberated preferences}
 The class of functions that we describe in this article, coming straight from decision theory, do most likely not constitute the best class of functions among which to search for good predictors of what people like, in many decision problems, including those of interest to us as described above. We acknowledge, and even, put forward, that our recommender system might not optimize predicted appreciation as well as a classical collaborative learning recommender system.
 In this section we will argue that depending on the situation, this might be a strength rather than a weakness.
 
@@ -76,24 +77,48 @@ We think a good starting point, in order to direct the learning process of decis
 Other approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior, thus, our proposal is not new in this respect. What is new is our proposal of a research agenda to develop such models not because they would best predict the user’s normal behavior, but because they could best describe her deliberated judgment; and our instanciation to collaborative learning.
 
 \section{Technical approach}
-Assume we have a set of users represented by $I$ of size $m \in \N$, a set of items represented by $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\intvl{1, 5}$ (throughout the article, this notation designates intervals in the integers). We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$, and of the items in a vector space $B$ of dimension $d_B \in \N$: user $i$ is described by $a_i \in A$, and item $j$ is described by $b_j \in B$.
+Assume we have a set of users represented by $I$ of size $m \in \N$, a set of items represented by $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\intvl{1, 5}$ (throughout the article, this notation designates intervals in the integers). 
+We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$: user $i$ is described by $a_i \in A$. 
+The items are described by a set of descriptors whose indices are in $\mathcal{C} = [[1, …, c, …, d]]$. The descriptor $B_c: J → X_c, B_c \in \mathcal{B}$ evaluates each item according to a scale $X_c$. 
+%We also write $B_{cj}$ for $B_c(j)$, viewing the description information as encoded in a matrix $B$. 
+Let $X = \prod_{c \in \mathcal{B}}$ denote the cardinal product space where descriptions of items lie, and let $b_j \in X$ denote the description of an item $j$.
 
+\subsection{Classical collaborative learning}
 In classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
 
+\subsection{Using given knowledge}
 However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
 
 We could define $u_i = W_A a_i$ and $v_j = W_B b_j$ and obtain $r_{ij} \approx a_i^T (W_A^T W_B) b_j$, thus we could optimize by searching for the best $(W_A^T W_B)$. But as this could be too constrained, we will also try to relax these constraints and search for a representation that takes into account that $u_i$ should be close to $W_A a_i$, but not necessarily equal.
 
+\subsection{Using criteria}
+Let us define $\succeq$, a binary relation on the possible items $\mathcal{J}$, as representing the deliberated preference of the user under hand, to which we recommend. (It is possible that $\mathcal{J}$ be bigger than the currently observed items $J$.) Let us see what conditions are necessary and sufficient for a function in our priviledged class of function to exist that represent her deliberated preferences. Define $\sim$ as the symmetric part of $\succeq$ and $\succ$ its asymmetric part. We assume for simplicity that there are at least three descriptors and that the scales $X_j$ are not “too big”: there exists an injection between each $X_j$ and the real numbers $\R$. These assumptions seem innocuous for the kind of applications we focus on in this article.
+
+Condition 1: $\succeq$ is a complete preorder (also called a weak order): a complete, reflexive, transitive relation.
+Thus, $\sim$ is an equivalence relation.
+
+Condition 2: if $b_j = b_{j'}$, then $j \sim j'$.
+
+With $\mathcal{C} = C ∪ \{c\}$ for some $c \in \mathcal{C}$, thus $C$ represents all descriptors but one, let $(x_C, x_c) \in X$ represent the description of an item $j \in \mathcal{J}$ where $x_C \in \prod_{c \in C} X_c$ describes the item $j$ on the criteria $C$ and $x_c$ is the remaining description.
+
+Condition 3: it is possible to define partial preferences $\succeq_c$ for each criterion, complete preorders, such that, all other things being equal, a better value on some criterion $c$, as judged by $\succ_c$, implies a preference for the new item. More precisely, using $\succ_c$ to denote the asymmetric part of $\succeq_c$, for any $C$ representing all criteria but one, and any two items having descriptions $b_j = (x_C, x_c)$ and $b_{j'} = (x'_C, x'_c)$ such that $x'_C = x_C$ and $x'_c \succ_c x_c$, it holds that $b_{j'} \succ b_j$.
+
+Condition 4: Trade-offs between two criteria must be independant of levels on other criteria.
+
+Condition 5: Some condition on the limit behavior of limit tradeoff situations (to ensure derivability).
+
+Theorem (to be checked): if the preference of the user $\succeq$ satisfies all the above conditions, then there exists a value function $v: \mathcal{J} → \R$ and partial value functions $v_c: X_c → \R$ for each criterion $c$ such that for any two items, $j \succeq j' ⇔ v(j) ≥ v(j')$ and $v(j) = \sum_{c \in \mathcal{C}} v_c(b_c(j))$, and the partial value functions $v_c$ are all increasing in $\succ_c$: if $x_c \succ_c x_{c'}$ then $v_c(x_c) \succ_c v_c(x_{c'})$.
+
 \subsection{Predict ratings with logits}
-We could want to check whether we are able to predict the right ratings. In that case, we would assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
+Assume we are given a loss function $L$ that compares the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$.
 
 Define $\sigma(\alpha, \beta, x) = \frac{1}{1+\alpha e^{-\beta x}}$.
 
-We would want to find $w, a, b$ that optimize the following objective:
+We want to find $\{w_i^c, i \in I, c \in \mathcal{C}\}, \{\alpha^c, c \in \mathcal{C}\}, \{\beta^c, c \in \mathcal{C}\}$ that optimize the following objective:
 \begin{equation}
-\min_{w, \alpha, \beta} \sum_{(i, j) \in O} L(r_{ij}, \sum_l w_l^i \sigma(\alpha_l, \beta^l, b_j^l)) + \lambda \sum_{i, l} ||w_l^i ||_2^2.
+\min_{w, \alpha, \beta} \sum_{(i, j) \in O} L(r_{ij}, \sum_{c \in \mathcal{C}} w_i^c \sigma(\alpha^c, \beta^c, b_j^c)) + \lambda \sum_{i, c} \norm{w_i^c}_2^2.
 \end{equation}
-We force $w$ positive. And $a$ forced positive to respect the preference direction. Where $b_j^l$ is the performance of item $b_j$ on criterion $l$.
+We force $w$ positive. And $\alpha$ is forced positive to respect the preference direction: we assume the data is encoded so that higher $b_j^c$ means preferred performance. Where $b_j^c$ is the performance of item $b_j$ on criterion $c$.
 
 \subsection{Predict ratings}
 We could want to check whether we are able to predict the right ratings. In that case, we would assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
