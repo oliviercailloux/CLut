@@ -1,3 +1,15 @@
+%CL
+\newcommand{\allitems}{\mathcal{J}}
+\newcommand{\items}{J}%the observed items, generally a subset of the possible items
+\newcommand{\mitems}[1][\eta]{J_{#1}}
+\newcommand{\mnitems}[1][\eta]{J^\downarrow_{#1}}
+\newcommand{\mdef}[1][\eta]{f^\text{def}_{#1}}
+\newcommand{\matt}[1][\eta]{f^\text{att}_{#1}}
+\newcommand{\itm}{j}
+\newcommand{\usr}{i}
+\newcommand{\allusers}{I}
+\newcommand{\uitems}{J_i}
+
 %Voting and MCDA
 \newcommand{\allalts}{\mathscr{A}}
 \newcommand{\alts}{A}
@@ -43,9 +55,9 @@
 \newcommand{\gextlab}[2][]{
 	\labelling{\mathcal{GE}}_{(#2, \nonemptyor{#1}{\ibeatsr{#2}})}
 }
-\newcommand{\allargs}{A^*}
-\newcommand{\args}{A}
-\newcommand{\ar}{a}
+\newcommand{\allargs}{S^*}
+\newcommand{\args}{S}
+\newcommand{\ar}{s}
 \newcommand{\ext}{\mathcal{E}}
 
 %MCDA+Arg
@@ -53,6 +65,7 @@
 \newcommand{\ileadsto}{\rightsquigarrow}
 \newcommand{\mleadsto}[1][\eta]{\rightsquigarrow_{#1}}
 \newcommand{\ibeats}{\vartriangleright}
+\newcommand{\nibeats}{\not\vartriangleright}
 \newcommand{\mbeats}[1][\eta]{\vartriangleright_{#1}}
 
 %MISC
@@ -60,7 +73,7 @@
 \newcommand{\weightst}{W^{\,t}}
 
 %MCDA classical
-\newcommand{\crits}{\mathcal{J}}
+\newcommand{\crits}{\mathcal{C}}
 
 %Sorting
 \newcommand{\cats}{\mathcal{C}}

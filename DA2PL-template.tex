@@ -1,0 +1,167 @@
+\documentclass{da2pl2018}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{eurosym}
+\usepackage{amsmath,amsthm,amssymb,stmaryrd,pifont,wasysym}
+\usepackage{dsfont}
+\usepackage{pstricks,pst-plot,pst-text,pst-tree,pst-eps,pst-fill,pst-node,pst-math}
+\usepackage{microtype}
+
+\usepackage{amssymb}
+%\usepackage{tikz}
+%\usepackage{algorithme}
+
+%\usetikzlibrary{shapes,shadows}
+%\usepgflibrary{shapes}
+%\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+
+
+
+%%\ecaisubmission   % inserts page numbers. Use only for submission of paper.
+                  % Do NOT use for camera-ready version of paper.
+
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{assertion}{Assertion}
+\newtheorem{proposition}{Proposition}
+\newtheorem{example}{Example}
+
+\def\ent { \mathbb{N} }
+\def\reel { \mathbb{R} }
+\def\comp { \mathbb{C} }
+\def\zent { \mathbb{Z} }
+\def\rat { \mathbb{Q} }
+\newcommand{\Q}{\widehat{\mathcal{W}}} % {\mathcal{Q}}
+\def\Ar {\mathit{Ex}}
+\def \ArAllZero {\Ar_{\mathcal{S},\mathcal{W}}}
+\def \ArAllOne {\Ar_{\mathcal{S}}}
+\def \ArAllTwo {\Ar_{\widehat{\mathcal{S}}}}
+\def \ArAllFour {\Ar_{4.4}}
+\def \ArAllFive {\Ar_{4.6}}
+\def \ArAllSix {\Ar_{\widehat{\mathcal{S}},\widehat{\mathcal{W}}}}
+\def \ArAllSeven {\Ar^{\mathrm{Copeland}}_{\widehat{\mathcal{S}},\widehat{\mathcal{W}}}}
+\def \ArAllEight {\Ar^{\mathcal{R}}_{\widehat{\mathcal{S}},\widehat{\mathcal{W}}}}
+\def \cl {\mathrm{cl}}
+\def \Cl {\mathcal{C}\mbox{\hspace*{-0.03cm}}l}
+\def \NCl {\mathcal{N}\mbox{\hspace*{-0.03cm}}\mathcal{C}\mbox{\hspace*{-0.03cm}}l}
+\def \atom {\downarrow\!}
+\def\Chi {\mathrm{Child}}
+\def \cost {\mathit{comp}}
+\def \cov {\mathit{cov}}
+\def \WCW {\mathrm{WCW}}
+
+\newcommand{\refe}[1] {(\ref{#1})}
+\def\dep {\hspace*{-\parindent}}
+\def\proof { \dep {\bf Proof :} }
+\def\sketchproof { \dep {\bf Proof (Sketch):} }
+\def\endproof {\rule{2mm}{2mm} \vspace*{3mm}}
+
+\newcommand{\todoNico}[1] {{\bf [[TODO: {#1}]]}}
+% Indique un nouveau texte dans le papier
+\definecolor{darkgreen}{rgb}{0,0.9,0}
+\definecolor{darkred}{rgb}{0.9,0,0}
+\def\NEWTEXTChris  {\color{darkgreen}}
+\def\NEWTEXTChrisBis {\color{black}}
+\def\TEXTAENLEVER {\color{yellow}}
+\def\nico {\color{black}}
+\def\wass{\color{black}}
+\def\vincent{\color{black}}
+\def\christophe{\color{black}}
+%\newtheorem{algorithm}{Algorithm}
+
+\begin{document}
+
+\title{A general theory of the world and further little details}
+
+%\author{Tracking Number: \# 255 }
+\author{Groucho Marx\institute{Institute of humoristic research, email: groucho.marx@hilarious.com} %\and yet another author\institute{another institution}
+}
+
+
+\maketitle
+\bibliographystyle{ecai2012}
+
+\begin{abstract}
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract. This is the abstract. This is the abstract.
+This is the abstract.
+\end{abstract}
+
+% #########################################################################
+\section{Introduction}
+\label{intro}
+% #########################################################################
+
+
+ My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is
+ rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is
+ rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is
+ rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is rich. My tailor is
+ rich.
+
+% #########################################################################
+\section{Section 1}
+\label{background}
+% #########################################################################
+
+This is section 1. This is section 1. This is section 1. This is
+section 1. This is section 1.This is section 1. This is section 1.
+This is section 1. This is section 1. This is section 1. This is
+section 1.This is section 1. This is section 1. This is section 1.
+This is section 1. This is section 1. This is section 1.This is
+section 1. This is section 1. This is section 1. This is section 1.
+This is section 1. This is section 1.This is section 1.
+
+% ========================================================================
+\subsection{subsection 1.1}
+% ========================================================================
+
+ This is the text of  subsection 1.1. This is the text of  subsection 1.1.  This is the text of  subsection 1.1.  This is the text of  subsection 1.1. This is the text of  subsection 1.1.  This is the text of  subsection 1.1.
+ This is the text of  subsection 1.1. This is the text of  subsection 1.1.  This is the text of  subsection 1.1.
+ This is the text of  subsection 1.1. This is the text of  subsection 1.1.  This is the text of  subsection 1.1.
+ This is the text of  subsection 1.1. This is the text of  subsection 1.1.  This is the text of  subsection 1.1.
+ This is the text of  subsection 1.1.  This is the text of  subsection 1.1.
+
+
+
+
+
+
+% ========================================================================
+\subsection{Subsection 1.2}
+\label{background2}
+% ========================================================================
+
+
+ Yet another subsection. Yet another subsection. Yet another
+ subsection. Yet another subsection. Yet another subsection. Yet another
+ subsection. Yet another subsection. Yet another subsection. Yet another
+ subsection. Yet another subsection. Yet another subsection. Yet another
+ subsection. Yet another subsection. Yet another subsection. Yet another
+ subsection. Yet another subsection. Yet another subsection. Yet another
+ subsection. Yet another subsection. Yet another subsection. Yet another
+ subsection. Yet another subsection. Yet another subsection. Yet another subsection.
+
+
+% #########################################################################
+
+\section{Conclusion}
+ \label{sec:conc}
+
+ This paper investigates ... and proposes .... Further research
+ should be conducted to ...
+
+
+% #########################################################################
+%\bibliography{biblio}
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
