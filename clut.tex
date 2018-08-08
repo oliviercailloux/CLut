@@ -201,10 +201,16 @@ We do not mandate that \acp{ARS} be able to determine all the items in the delib
 \subsection{Relation to existing literature}
 Other approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior, thus, our proposal is not new in this respect. What is new is our proposal of a research agenda to develop such models not because they would best predict the user’s normal behavior, but because they could best describe her deliberated judgment; and our instanciation to collaborative learning.
 
+Some approaches suggest to directly optimize the model for predicting a ranking rather than predict best items \citep{rendle_bpr:_2009}, when the task amounts to predict a ranking. In our case, we aim at predicting best items and not rankings. Moreover, our model is targeted to learn an MAVT model in order to be able to predict the items in the deliberated preference of the user, rather than her intuitive preference, which traditional approaches do not attempt to do.
+
+There are also articles that are interested in using collaborative filtering on the basis of implicit feedback \citep{rendle_bpr:_2009, hu_collaborative_2008}, an idea somewhat related to ours in the sense that the observed data is not directly the one the model tries to predict.
+
+Also somewhat related are articles that are interested in collecting preference data for improving the learning \citep{sepliarskaia_preference_2018}.
+
 \subsection{Going beyond}
 More elaborated developments of our proposal would incorporate biases known from experimental psychology to systematically attempt to correct possible mistakes of the user (the word “mistake” referring to the difference between her usual behavior and her own deliberated judgment).
 
-\bibliography{clut}
+\bibliography{clut,zotero}
 
 \appendix
 \section{Double-strategy}
