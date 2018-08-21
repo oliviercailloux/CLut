@@ -33,7 +33,7 @@ In the collaborative learning community, this is usually taken to mean: recommen
 
 Together with this new goal, it is necessary to propose a corresponding measure of the performance of the recommender system (done in \cref{sec:pred}). In the classical approach, measuring the performance of the system amounts to compare its claims (the items it proposes as preferred) to reality (the preference of the user). Because the deliberated preference of the user is not directly observable, this direct check of correspondance becomes non applicable. However, as I will show, the problem of evaluating the quality of an \ac{AR} can be framed as a prediction problem (although involving different objects), thereby recovering the possibility of empirical validation by confrontation between claims of the system and reality.
 
-\Cref{sec:princ} then sketches one possible way of undertaking this task, applicable in specific contexts: recommend on the basis of some explicit principles coming from decision theory.
+\Cref{sec:princ} then sketches one possible way of undertaking this task, applicable in specific contexts: recommend on the basis of some explicit principles coming from decision theory. \Cref{sec:litt,sec:disc} provide further references and discussion.
 
 \section{Definition of deliberated preference}
 \label{sec:def}
@@ -88,6 +88,7 @@ By contrast, a recommendation task is not suitable for the approach proposed her
 %The literature has deeply investigated necessary and sufficient conditions for an \ac{MAVT} model to exist that represent $\succeq$ \citep{k, gonzales}, which will be useful to assess whether it seems reasonable to 
 
 \section{Relation to existing literature}
+\label{sec:litt}
 Approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior \citep{greco_trends_2010, sobrie_learning_2018}. 
 Furthermore, numerous approaches have been proposed for modeling preferences using machine learning methods \citep{furnkranz_preference_2010}. Both these trends constitute promising areas of investigation for building \acp{AR}.
 There are also articles that are interested in using collaborative filtering on the basis of implicit feedback \citep{rendle_bpr:_2009, hu_collaborative_2008}, an idea somewhat related to ours in the sense that the observed data is not directly the one the model tries to predict.
@@ -98,6 +99,7 @@ An important literature analyzes necessary and sufficient conditions for the exi
 
 \appendix
 \section{Discussion}
+\label{sec:disc}
 %\subsection{The need for another notion of preference}
 In this article we are interested in a notion of preference that possibly changes when confronted to arguments. That is, we assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind when presented with arguments in favor of, or counter-arguments against, various items. 
 
@@ -110,114 +112,4 @@ We do not mandate that \acp{AR} be able to determine all the items in the delibe
 
 \acp{AR} may have very few claims, and accordingly, may have a low chance of being falsified (as an extreme case, an \ac{AR} that claims nothing is unfalsifiable). This reflects the usual difficulty that scientists face: general theories are better, but more difficult to get right.
 
-\section{Sufficient conditions for an MAVT representation}
-Condition 1: the descriptors $\{b_c, c \in \crits\}$ are such that whether $\itm \succeq \itm'$ depend only on the descriptions on the items according to $\set{b_c, c \in \crits}$.
-
-In the sequel we treat $\succeq$ as a relation over $X = \prod_{c \in \crits} X_c$, which we can do thanks to condition 1.
-Define $\sim$ as the symmetric part of $\succeq$ and $\succ$ its asymmetric part.
-Thus, $\sim$ is an equivalence relation.
-
-Our second condition mandates that comparisons between two items that have the same value on some descriptor do not change if that value changes equally for both items (thus, the comparison must be independent of that value provided it is equal on both items). For example, if the user deliberately prefers a flat that is 50 meters square and has a washing machine to a flat that is 60 meters square but has no washing machine, given that both flats are priced 500 € (and assuming only these three criteria matter), then the user has the same deliberated preference ordering for two flats that have the same characteristics except that they are both priced 800 €.
-
-With $C = \crits \setminus \{c\}$ for some $c \in \crits$, thus $C$ contains all criteria but one, let $X_C = \prod_{d \in C} X_d$, and let $(x_C, w_c) \in X$ represent the performance of an item $\itm \in \allitems$ where $x_C \in X_C$ describes the item $\itm$ on the criteria $C$ and $w_c \in X_c$ is the remaining description. %Similar notation is used when $C$ contain all criteria but two.
-
-Condition 2: $\forall C = \crits \setminus \{c\}, w_c, z_c \in X_{c}, x_C, y_C \in X_C: (x_C, w_c) \succ (y_C, w_c) ⇒ (x_C, z_c) \succ (y_C, z_c)$.
-
-Our last two conditions are more technical. First, the set of possible items must be rich enough. We say that a criterion $c$ is solvable iff, with $C = \crits \setminus \{c\}$, for all $x \in \allitems$ and $y_C \in X_C$, there exists $z_c \in X_c$ such that $x \sim (y_C, z_c)$.
-In the example of a choice of a flat, three solvable criteria might be the size of the flat in meter squares, its price, and its distance to the city center. The presence of a washing machine is a non solvable criterion.
-
-Condition 3: there are at least three solvable criteria.
-
-The second technical and last condition is an archimedian requirement. In loose terms, we want to forbid that some item be infinitely far away, in the sense that the item would be preferred to an infinite sequence of equally spaced items. Given a criterion $c$, with $C = \crits \setminus \{c\}$, given $y_C, z_C \in X_C$, we say that $y_C$ and $z_C$ are not indifferent iff there exists some $x_c \in X_c$ such that not $(x_c, y_C) \sim (x_c, z_C)$ (note that by Condition 2, this “exists” is equivalent to a “for all”). Given $c \in \crits, C = \crits \setminus \{c\}$, we say that an infinite sequence of values in $X_c$ is equally spaced iff there exists $y_C, z_C \in X_C$ not indifferent such that for any two consecutive elements $x_c, x'_c$ in the sequence, $(x_c, y_C) \sim (x'_c, z_C)$. Furthermore, such a sequence is bounded iff there exists an item that is strictly deliberately preferred to $(x_c, y_C)$ for every $x_c$ in the sequence.
-
-Condition 4: There exists a solvable criterion $c$ such that there is no infinite sequence of values in $X_c$ that is equally spaced and bounded.
-
-\begin{thm}
-	Given a set of items $\allitems$, a set of criteria $\crits$, scales $X_c$ and descriptors $b_c: \allitems → X_c, c \in \crits$, and $\succeq$ a binary relation over $\allitems$, if the four conditions above are satisfied, then an \ac{MAVT} model representing $\succeq$ exists.
-\end{thm}
-
-\section{Estimating an MAVT model}
-Assume we have a set of users $I$ of size $m \in \N$, a set of items $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\intvl{1, 5}$ (throughout the article, this notation designates intervals in the integers). 
-We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$: user $i$ is described by $a_i \in A$. 
-The items are described by a set of descriptors whose indices are in $\mathcal{C} = [[1, …, c, …, d]]$. The descriptor $B_c: J → X_c, B_c \in \mathcal{B}$ evaluates each item according to a scale $X_c$. 
-%We also write $B_{cj}$ for $B_c(j)$, viewing the description information as encoded in a matrix $B$. 
-Let $X = \prod_{c \in \mathcal{B}}$ denote the cardinal product space where descriptions of items lie, and let $b_j \in X$ denote the description of an item $j$.
-
-\subsection{Classical collaborative learning}
-In classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
-
-\subsection{Using given knowledge}
-However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
-
-We could define $u_i = W_A a_i$ and $v_j = W_B b_j$ and obtain $r_{ij} \approx a_i^T (W_A^T W_B) b_j$, thus we could optimize by searching for the best $(W_A^T W_B)$. But as this could be too constrained, we will also try to relax these constraints and search for a representation that takes into account that $u_i$ should be close to $W_A a_i$, but not necessarily equal.
-
-\subsection{Predict ratings with logits}
-Assume we are given a loss function $L$ that compares the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$.
-
-Define $\sigma(\alpha, \beta, x) = \frac{1}{1+\alpha e^{-\beta x}}$.
-
-We want to find $\{w_i^c, i \in I, c \in \mathcal{C}\}, \{\alpha^c, c \in \mathcal{C}\}, \{\beta^c, c \in \mathcal{C}\}$ that optimize the following objective:
-\begin{equation}
-\min_{w, \alpha, \beta} \sum_{(i, j) \in O} L(r_{ij}, \sum_{c \in \mathcal{C}} w_i^c \sigma(\alpha^c, \beta^c, b_j^c)) + \lambda \sum_{i, c} \norm{w_i^c}_2^2.
-\end{equation}
-We force $w$ positive. And $\alpha$ is forced positive to respect the preference direction: we assume the data is encoded so that higher $b_j^c$ means preferred performance. Where $b_j^c$ is the performance of item $b_j$ on criterion $c$.
-
-\subsection{Predict ratings}
-We could want to check whether we are able to predict the right ratings. In that case, we would assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
-
-We would want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
-\begin{equation}
-\min_{U, V, W_A, W_B} \sum_{(i, j) \in O} L(r_{ij}, u_i^T v_j) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
-\end{equation}
-
-\subsection{Predict orders}
-We are interested in comparing our predictions to orderings (because that’s what we have underhand).
-
-We assume we are given loss function $L$, that compares preorders (transitive and reflexive binary relations), and $L_I$ and $L_J$, as above. We assume we have a preorder $≥_i$ for each user indicating her true preference over some pairs of items among $J$.
-
-We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
-\begin{equation}
-\min_{U, V, W_A, W_B} \sum_{i \in i} L(≥_i, \set{(v_j, v_{j'}) \suchthat u_i^T v_j ≥ u_i^T v_{j'}}) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
-\end{equation}
-
-\subsection{Data set: Sushi}
-We experiment using the Sushi data set (ref…)
-
-Here $J$ is a set of $100$ sushi types \footnote{$X^*=X_B$ in the original notation.}. The original authors collected the sushi from the menu of 25 restaurants, computed the frequency of each sushi type occurring on a menu, and took the $100$ most frequent. Write $P_J$ the frequency (thus a multiple of $1/25$).
-
-Write $J_\text{top} \subset J$ the $10$ most frequent sushi types \footnote{$X_A$}.
-
-The set $I$ has cardinal $m = 5000$. The authors drew randomly a set of 10 sushi types among $J$, for each user $i$, according to the distribution $P_J$. Let us denote this by $J_i \subset J$ \footnote{$X^B_i$}.
-
-The authors obtained, for each user $i$ in $I$, three preferential informations, defined as strict partial orders (transitive, asymmetric binary relations). First, they collected a preference ordering over the sushi types from $J_\text{top}$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering \footnote{$O^A_i$} (“top” designates the fact that the ordering is over the 10 most frequent sushi types). Second, they collected a rating, in $\intvl{1, 5}$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user think each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ \footnote{$O^B_i$} (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
-
-Users are described in a space $A$ comprising the attributes $\{$gender, age category, origin-prefecture, origin-region, origin-east/west (binary), current-region, current-east/west (binary), origin-prefecture$\}$. Items are described in a space $B$ comprising the attributes $\{$group, heaviness/oiliness in taste (in $[0, 4]$), frequency of eating (in $[0, 3]$), normalized price (in $[0, 1]$), $P_J(j)$$\}$.
-
-We summarize the preference of $i$ as follows. The ratings over $J_i$ are transformed to preorders $≥^\text{rating}_i$ that tolerate ex-æquos, in the obvious way (better ratings indicate preference). We then merge, for each user $i$, all preferential information, considering contradictions as indicating indifference, and obtain a preorder $≥_i = [≥^\text{rating}_i ∪ >^\text{top}_i ∪ >^\text{indiv}_i]$, where the brackets designate taking the transitive closure and adding the identity relation (to obtain reflexivity). For example, if $>^\text{top}_i$ represents the ordering $(j_1 > j_2 > j_3)$ and $>^\text{indiv}_i$ represents $(j_6 > j_3 > j_4 > j_2)$ and $≥^\text{rating}_i = \emptyset$, then $≥_i$ considers $j_1$ and $j_6$ as strictly preferred to $j_2$ to $j_4$, $j_2$ to $j_4$ ex-æquos, and $j_1$ incomparable to $j_6$.
-
-\section{More discussion}
-\subsection{About the definition of the situation}
-The notion of deliberated preference is a simplification of the recently proposed concept of deliberated judgement \citep{cailloux_formal_2017}, applied to the notion of preference (instead of the less specific notion of judgement), and instanciated for collaborative learning.
-
-We insist, to avoid turning recommendation into persuasion or manipulation, that the set of all arguments $\allargs$, in our conception, must not be restricted to arguments judged as good arguments from some external point of view, but should contain a wide range of arguments that can possibly be considered by various (possibly disagreeing) sources as possibly influencing $\usr$.
-
-There are multiple ways of instantiating the experiment represented by $\ibeats$, for example, we may consider stated attitude or revealed attitude, and we have to choose some way of presenting the arguments to $\usr$; those various ways would possibly define different deliberated preferences.
-Alternatively, the deliberated preference of a user could be considered as consisting in those items that resist counter-arguments considering various ways of presenting arguments.
-We do not discuss here the difficulties related to distinguishing strict preference from indifference in revealed preference approaches, and consider (as a possibly somewhat simplistic assumption) that strict preference can be equated to a willingness to pay a small amount to switch from one item to the preferred one, or that the experiment can be repeated and that strict preference holds if a systematic choice is observed \citep{danan_revealed_2008}.
-
-\section{Double-strategy}
-In the double-strategy, we use different dimensions: $k = d_{A'} + d_U = d_{B'} + d_V$.
-The matrix $W_A$ has size $(d_{A'}, d_A)$ and $U$ has size $(m, d_U)$. $W_B$ has size $(d_{B'}, d_B)$ and $V$ has size $(d_V, n)$. $r_{ij} = \mu_i^T \nu_j$ where $\mu_i$ is the $k$-dimensional vector composed of $W_A a_i$ then $u_i$ and $\nu_j$ is composed of $W_B b_j$ then $v_j$.
-
-We should compare this approach to the more classical one.
-
-\section{Using raw item descriptions}
-The matrix $W_B$ could be constrained to having mostly zeroes, to make sure that indeed the attributes of the items ($b_j$) are used in their $\mu$-vectorial description. We could even take $d_{B'} = d_B$ and take $W_B$ equal to identity. (Is there any benefit not to do so?)
-
-This suggests the following simple approach: concatenate $b_j$ to $v_j$ to obtain $\nu_j$. Don’t use $W_B$. Obtain $\mu_i$ of size $k = d_B + d_V$, using $W_A a_i$ as its first components.
-
-\section{Factorization machines}
-We should compare (theoretically or experimentally) our approach to factorization machines.
-
 \end{document}
-
