@@ -321,7 +321,8 @@
 \setlength\lineskip{1\p@}
 \setlength\normallineskip{1\p@}
 \renewcommand\baselinestretch{1}
-\setlength\parskip{0\p@}
+%Removed by Olivier Cailloux: “you have removed all flexibility from \parskip and set it to a length which is not a multiple of \baselineskip”, https://tex.stackexchange.com/questions/371942/how-to-fix-underfull-vbox
+%\setlength\parskip{0\p@}
 \@lowpenalty   51
 \@medpenalty  151
 \@highpenalty 301
