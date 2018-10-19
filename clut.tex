@@ -30,13 +30,14 @@
 \section{Introduction}
 In a situation where a user has to choose an item among a set of possible items, recommender systems aim at recommending some item as most appropriate for the user.
 In the collaborative learning community, this is usually taken to mean: recommend an item among the most preferred for the user. In this article, I want to propose another goal for recommender systems. I keep the global aim of recommending some item as most appropriate for a given user, but I propose a different understanding of appropriateness. The goal I propose is to recommend an item among those that are in the \ac{DP} of the user, and to prove that it does. The \ac{DP} of the user captures what she prefers when considering all arguments in favor or against all possible items. This differs from her intuitive preference in that the latter does not consider arguments. Thus, the goal I propose is appropriate when one is interested to help the user form a deliberated judgment about which item is best, rather than predict which item the user intuitively prefers. Because this will be done using systems that argue, I call the kind of system I define here an \ac{AR}.
+Further motivations for this new goal are described in \cref{sec:motiv}, and it is precisely defined in \cref{sec:def}.
 
 Together with this new goal, it is necessary to propose a corresponding measure of the performance of the recommender system (done in \cref{sec:pred}). In the classical approach, measuring the performance of the system amounts to compare its claims (the items it proposes as preferred) to reality (the preference of the user). Because the \ac{DP} of the user is not directly observable, this direct check of correspondance becomes non applicable. However, as I will show, the problem of evaluating the quality of an \ac{AR} can be framed as a prediction problem (although involving different objects), thereby recovering the possibility of empirical validation by confrontation between claims of the system and reality.
 
 \Cref{sec:princ} then sketches one possible way of undertaking this task, applicable in specific contexts: recommend on the basis of explicit principles coming from decision theory. \Cref{sec:litt} provide further references and discussion.
 
 \section{Motivation}
-\label{sec:disc}
+\label{sec:motiv}
 This article discusses a notion of preference that possibly changes when confronted to arguments. That is, I assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind when presented with arguments in favor of, or counter-arguments against, various items. 
 
 By contrast, the notion of preference considered by classical recommender systems (usually left implicit) is that the user intuitively knows what he prefers, and that this is the right basis for him to decide. This notion can be related to the conception of preference put forth by \citet[p. 16]{von_neumann_theory_1944} in their seminal work. They write that “It is clear that every measurement – or rather every claim of measurability – must ultimately be based on some immediate sensation (…). In the case of utility the immediate sensation of preference (…) provides this basis.” When applied to collaborative filtering, this view suggests that the user does not need help for comparing pairs of item: the job of the system is merely to relieve the user from having to search through the whole set. 
@@ -47,25 +48,19 @@ This notion of preference as “intuitive” preference is not always the best b
 Second, the best choice might be the result of a complex thought process that should better ensure, as much as possible, that all relevant arguments have been considered, rather than purely rely on intuition.
 Consider the decision of which smartphone, or which computer, or which house, to buy. 
 This is also easily the case when a notion of fairness is involved, for example when determining who will receive a prize, or how to best distribute revenue in a society, or to which cause I should donate money.
-Third, the user might appreciate being pointed to some non-salient feature of the items under comparison; for example, a user might feel an intuitive attraction to the plane alternative when chosing a transportation means for holidays, seeing that the flight time is only one hour compared to three hours by train, but change her mind when being reminded that the total travel time should be taken into account. Finally, an argument coming from psychology is that unaided intuition is known to be sensible, in some contexts, to framing effects that would perhaps not be considered relevant (by the user himself) when considering arguments and counter-arguments \citep{kahneman_thinking_2013}. An example that involves several kinds of the just enumerated concerns is obtaining a decision procedure for credit requests in a bank: the user probably wants to involve fairness considerations in order to avoid (unconscious) appearance of unjust discriminations; and even if only profit considerations are to bear, the user might want the procedure to go beyond reflecting the bare intuition of an expert.
-Therefore, the relation $\ibeats$ plays here the role of the basic observable \citeauthor{von_neumann_theory_1944} talk about.
-
-I do not mandate that \acp{AR} be able to determine all the items in the \ac{DP} of a user, but merely that the items it claims are in the \ac{DP} of a user be indeed, and that its proofs of this fact be valid, and similarly for the items claimed as not belonging to the \ac{DP} of a user. This is for two reasons: this requirement suffices to yield possibly useful systems (provided $\mitems ≠ \emptyset$), and being able to completely predict the \ac{DP} of a user might reveal extremely difficult. 
-As a consequence, \acp{AR} may have very few claims and, correspondingly, face low risks of falsification (as an extreme case, an \ac{AR} that claims nothing is unfalsifiable). This reflects a usual tradeoff in science: general theories are better, but more difficult to get right.
-
-In order to avoid turning recommendation into persuasion or manipulation, 
-it is important that the set of all arguments $\allargs$ be not restricted to arguments judged as good arguments from some unique point of view, but rather contains a wide range of arguments promoted by (possibly disagreeing) sources. Accordingly, diverse \acp{AR} should be compared for a given problem in order to span the relevant arguments.
+Third, the user might appreciate being pointed to some non-salient feature of the items under comparison; for example, a user might feel an intuitive attraction to the plane alternative when chosing a transportation means for holidays, seeing that the flight time is only one hour compared to three hours by train, but change her mind when being reminded that the total travel time should be taken into account. Finally, an argument coming from psychology is that unaided intuition is known to be sensible, in some contexts, to framing effects that would perhaps not be considered relevant (by the user himself) when considering arguments and counter-arguments \citep{kahneman_thinking_2013}. An example that involves several kinds of the just enumerated concerns is obtaining a decision procedure for credit requests in a bank: the user probably wants to involve fairness considerations in order to avoid (possibly unconscious) appearance of unjust discriminations; and even if only profit considerations are to bear, the user might want the procedure to go beyond reflecting the bare intuition of an expert.
 
 \section{Definition of deliberated preference}
 \label{sec:def}
 This section describes the new understanding of preference I propose, called the \ac{DP} of the user (it is a simplification of the recently proposed concept of deliberated judgment \citep{cailloux_formal_2018}).
 
-I consider given a set of items $\allitems$ among which a user $\usr$ wants to choose. I also consider given a set $\allargs$ containing arguments that may possibly help $\usr$ form a deliberated opinon about which item is best for her (elements of $\allargs$ are not detailed and can be conceived as strings in a natural language). 
+I consider given a set of items $\allitems$ among which a user $\usr$ wants to choose. I also consider given a set $\allargs$ containing arguments that may possibly help $\usr$ form a deliberated opinon about which item is best for her. Elements of $\allargs$ are not detailed and can be conceived as strings in a natural language. An example of an argument is $\ar = $ “Item $\itm$ is better than item $\itm'$ because $\itm$ has a good performance on criteria ‘price’ and ‘speed’ while item $\itm'$ has a good performance only on criterion ‘aspect’, which you do not consider important”.
 
 The \ac{DP} of $\usr$ is defined as the subset of items that are considered by $\usr$ as having no item strictly preferred to them, considering all arguments in $\allargs$. To define this properly, I assume we can observe the reaction of $\usr$ to arguments, as follows. 
 
 Define $\ibeats$ as a binary relation over $\allitems × \allargs$, representing the results of the following experiments. Present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and let her decide, considering the arguments $\ar$ and $\ar'$, which item among $\itm$ and $\itm'$ she prefers, if any. 
 Define $(\itm, \ar) \ibeats (\itm', \ar')$ iff $\usr$ strictly prefers $\itm$ to $\itm'$, given $\ar$ and $\ar'$. Note that if no strict preference holds, $\ibeats$ does not relate these two pairs (thus $(\itm, \ar) \nibeats (\itm', \ar')$ and $(\itm', \ar') \nibeats (\itm, \ar)$). 
+The relation $\ibeats$ plays here the role of the basic observable \citeauthor{von_neumann_theory_1944} talk about (see \cref{sec:motiv}).
 
 The \ac{DP} $\uitems \subseteq \allitems$ of $\usr$ in that situation contains an item $\itm$ iff $\forall (\itm', \ar') \in \allitems × \allargs, \exists \ar \in \allargs \suchthat (\itm', \ar') \nibeats (\itm, \ar)$.
 
@@ -109,7 +104,7 @@ By contrast, a recommendation task is not suitable for the approach proposed her
 
 %The literature has deeply investigated necessary and sufficient conditions for an \ac{MAVT} model to exist that represent $\succeq$ \citep{k, gonzales}, which will be useful to assess whether it seems reasonable to 
 
-\section{Relation to existing literature}
+\section{Relation to existing literature and final remarks}
 \label{sec:litt}
 Approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior \citep{greco_trends_2010, sobrie_learning_2018}. 
 Furthermore, numerous approaches have been proposed for modeling preferences using machine learning methods \citep{furnkranz_preference_2010}. Both these trends constitute promising areas of investigation for building \acp{AR}.
@@ -119,7 +114,14 @@ Also somewhat related are articles interested in collecting preference data for 
 An important literature analyzes necessary and sufficient conditions for the existence of various decision-theoretic models \citep{krantz_foundations_1971, gonzales_additive_1996, bouyssou_consolidated_2015}.
 Finally, this proposal is intimately related to the important literature on explainable AI \citep{DBLP:journals/corr/abs-1804-11192}.
 
-\textbf{Acknowledgements} I thank Florian Yger and Jill-Jênn Vie for insightful discussions and the CNRS PEPS program for financial support.
+Two final remarks might be useful.
+First, I do not mandate that \acp{AR} be able to determine all the items in the \ac{DP} of a user, but merely that the items it claims are in the \ac{DP} of a user be indeed, and that its proofs of this fact be valid, and similarly for the items claimed as not belonging to the \ac{DP} of a user. This is for two reasons: this requirement suffices to yield possibly useful systems (provided $\mitems ≠ \emptyset$), and being able to completely predict the \ac{DP} of a user might reveal extremely difficult. 
+As a consequence, \acp{AR} may have very few claims and, correspondingly, face low risks of falsification (as an extreme case, an \ac{AR} that claims nothing is unfalsifiable). This reflects a usual tradeoff in science: general theories are better, but more difficult to get right.
+
+Second, in order to avoid turning recommendation into persuasion or manipulation, 
+it is important that the set of all arguments $\allargs$ be not restricted to arguments judged as good arguments from some unique point of view, but rather contains a wide range of arguments promoted by (possibly disagreeing) sources. Accordingly, diverse \acp{AR} should be compared for a given problem in order to span the relevant arguments.
+
+\section*{Acknowledgements} I thank Florian Yger and Jill-Jênn Vie for insightful discussions and the CNRS PEPS program for financial support.
 
 \bibliography{clut,manual}
 
