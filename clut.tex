@@ -12,116 +12,222 @@
 
 \begin{document}
 \title{%
-	Learning argumentative recommenders%
+	Collaborative learning of models of deliberated preference%
 }
 \author{Olivier Cailloux}
+\author{Florian Yger}
 \affil{Université Paris-Dauphine, PSL Research University, CNRS, LAMSADE, 75016 PARIS, FRANCE\\
 	\href{mailto:olivier.cailloux@dauphine.fr}{olivier.cailloux@dauphine.fr}
 }
 \makeatletter
 	\hypersetup{
-		pdfsubject={machine learning},
-		pdfkeywords={collaborative learning, recommender systems, argumentation, preference, decision theory, xai},
-		pdfauthor={Olivier Cailloux}
+		pdfsubject={collaborative learning},
+		pdfkeywords={machine learning},
+		pdfauthor={Olivier Cailloux, Florian Yger}
 	}
 \makeatother
 \maketitle
 
+% NB “The page limit is 8 for full papers” https://da2pl.cs.put.poznan.pl/call-for-papers
 \section{Introduction}
 In a situation where a user has to choose an item among a set of possible items, recommender systems aim at recommending some item as most appropriate for the user.
-In the collaborative learning community, this is usually taken to mean: recommend an item among the most preferred for the user. In this article, I want to propose another goal for recommender systems. I keep the global aim of recommending some item as most appropriate for a given user, but I propose a different understanding of appropriateness. The goal I propose is to recommend an item among those that are in the \ac{DP} of the user, and to prove that it does. The \ac{DP} of the user captures what she prefers when considering all arguments in favor or against all possible items. This differs from her intuitive preference in that the latter does not consider arguments. Thus, the goal I propose is appropriate when one is interested to help the user form a deliberated judgment about which item is best, rather than predict which item the user intuitively prefers. Because this will be done using systems that argue, I call the kind of system I define here an \ac{AR}.
+In the collaborative learning community, this is usually taken to mean: recommend an item among the most preferred for the user. In this article, we introduce another goal for recommender systems. We keep the global aim of recommending some item as most appropriate for a given user, but we propose a different understanding of appropriateness. The goal we propose is to recommend an item among those that are in the deliberated preference of the user, and to prove that it does. The deliberated preference of the user captures what she prefers when considering all arguments in favor or against all possible items. This differs from her intuitive preference in that the latter does not consider arguments. Thus, the goal we propose is appropriate when one is interested to help the user form a deliberated judgement about which item is best, rather than predict which item the user intuitively prefers.
 
-Together with this new goal, it is necessary to propose a corresponding measure of the performance of the recommender system (done in \cref{sec:pred}). In the classical approach, measuring the performance of the system amounts to compare its claims (the items it proposes as preferred) to reality (the preference of the user). Because the \ac{DP} of the user is not directly observable, this direct check of correspondance becomes non applicable. However, as I will show, the problem of evaluating the quality of an \ac{AR} can be framed as a prediction problem (although involving different objects), thereby recovering the possibility of empirical validation by confrontation between claims of the system and reality.
+Together with this new goal, it is necessary to propose a corresponding measure of the performance of the recommender system. In the classical approach, measuring the performance of the system amounts to compare its claims (the items it proposes as preferred) to reality (the preference of the user). Because the deliberated preference of the user is not directly observable, this direct check of correspondance becomes non applicable. However, as we will show, the problem of evaluating the quality of the recommendation in our sense can be framed as a prediction problem (although involving different objects), thereby recovering the possibility of empirical validation by confrontation between claims of the system and reality.
 
-\Cref{sec:princ} then sketches one possible way of undertaking this task, applicable in specific contexts: recommend on the basis of explicit principles coming from decision theory. \Cref{sec:litt,sec:disc} provide further references and discussion.
+This article is structured as follows. We first present the task of recommendation that we propose in general: we define precisely the notion of deliberated preference, then, the goal of a recommender system, and finally, the way its recommendations can be (in)validated. Then, we study one possible way of undertaking this task, applicable in specific contexts: we suggest to recommend on the basis of some explicit principles coming from decision theory. This requires to focus on situations where it is a priori plausible that those principles can be used to find an item in the deliberated preference of the user, and, importantly, can be used to prove that the item does belong to her deliberated preference. We will present some such situations and describe those principles. Third, we want to provide first steps towards showing technically how a recommender system can be built in our situation of choice, and study our building procedure and resulting system empirically by (among others) comparing it to classical recommender systems on a real dataset. Finally, we discuss some of our choices and relate our approach to existing literature.
 
-\section{Definition of deliberated preference}
-\label{sec:def}
-This section describes the new understanding of preference I propose, called the \ac{DP} of the user (it is a simplification of the recently proposed concept of deliberated judgment \citep{cailloux_formal_2018}).
+\section{Deliberated preference and collaborative learning}
+\subsection{Definition of deliberated preference}
+This section describes precisely the new understanding of preference we propose. We call it the deliberated preference of the user.
 
-I consider given a set of items $\allitems$ among which a user $\usr$ wants to choose. I also consider given a set $\allargs$ containing arguments that may possibly help $\usr$ form a deliberated opinon about which item is best for her (elements of $\allargs$ are not detailed and can be conceived as strings in a natural language). 
+We consider given a set of items $\allitems$ among which a user $\usr$ wants to choose. We also consider given a set $\allargs$ containing arguments that may possibly help $\usr$ form a deliberated opinon about which item is best for her (elements of $\allargs$ are not detailed and can be conceived as strings in a natural language). 
 
-The \ac{DP} of $\usr$ is defined as the subset of items that are considered by $\usr$ as having no item strictly preferred to them, considering all arguments in $\allargs$. To define this properly, I assume we can observe the reaction of $\usr$ to arguments, as follows. 
+We will define the deliberated preference of $\usr$ in that situation as the subset of items that are considered by $\usr$ as having no item strictly preferred to them, considering all possible arguments. To define this properly, we assume we can observe the reaction of $\usr$ to arguments, as follows. 
 
-Define $\ibeats$ as a binary relation over $\allitems × \allargs$, representing the results of the following experiments. Present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and let her decide, considering the arguments $\ar$ and $\ar'$, which item among $\itm$ and $\itm'$ she prefers, if any. 
-Define $(\itm, \ar) \ibeats (\itm', \ar')$ iff $\usr$ strictly prefers $\itm$ to $\itm'$, given $\ar$ and $\ar'$. Note that if no strict preference holds, $\ibeats$ does not relate these two pairs (thus $(\itm, \ar) \nibeats (\itm', \ar')$ and $(\itm', \ar') \nibeats (\itm, \ar)$). 
+Define $\ibeats$ as a binary relation over $\allitems × \allargs$, representing the results of the following experiments. We present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and let her decide, considering the arguments $\ar$ and $\ar'$, which item among $\itm$ and $\itm'$ she prefers, if any. 
+We define $(\itm, \ar) \ibeats (\itm', \ar')$ iff $\usr$ strictly prefers $\itm$ to $\itm'$, given $\ar$ and $\ar'$. Note that if no strict preference holds, $\ibeats$ does not relate these two pairs (thus $(\itm, \ar) \nibeats (\itm', \ar')$ and $(\itm', \ar') \nibeats (\itm, \ar)$). 
 
-The \ac{DP} $\uitems \subseteq \allitems$ of $\usr$ in that situation contains an item $\itm$ iff $\forall (\itm', \ar') \in \allitems × \allargs, \exists \ar \in \allargs \suchthat (\itm', \ar') \nibeats (\itm, \ar)$.
+The deliberated preference $\uitems \subseteq \allitems$ of $\usr$ in that situation contains an item $\itm$ iff $\forall (\itm', \ar') \in \allitems × \allargs, \exists \ar \in \allargs \suchthat (\itm', \ar') \nibeats (\itm, \ar)$.
 
-\section{Prediction of deliberated preference}
-\label{sec:pred}
-An \ac{AR} should be able, given a user, to single out some items as being in his \ac{DP}, and some items as being not in his \ac{DP}, and to prove its claims by arguing correspondingly. 
-Formally, an \ac{AR} $\eta$ has a \emph{scope} $\allusers$, representing a set of users it claims to be able to predict the \ac{DP} of, and gives, for a user $\usr \in \allusers$, a tuple $(\mitems, \mdef, R_\eta, \matt)$, where $\mitems \subseteq \allitems$ is a set of items that $\eta$ claims are among the \ac{DP} of $\usr$, $\mdef: \mitems × \allitems → \allargs$ is an argumentation strategy used to defend items in $\mitems$, $R_\eta \subseteq \allitems × \allitems$ is a binary relation that contains pairs of items $(\itm, \itm')$ such that $\eta$ claims that $\usr$ deliberately prefers $\itm$ to $\itm'$, and $\matt: R_\eta → \allargs$ is an argumentation strategy used to support the claims represented by $R_\eta$. (Elements of this tuple depend on $i$, though this is omitted from the notation.)
+\subsection{Prediction of deliberated preference}
+We can now define the goal of a recommender system. A recommender system (as considered here) should be able, given a user, to single out some items as being in his deliberated preference, and some items as being not in his deliberated preference, and to prove its claims by arguing correspondingly. For this reason, we call the kind of recommender system that we define here an \ac{ARS}.
 
-An \ac{AR} is valid if its functions $\mdef$ and $\matt$ indeed justify its claims. Informally, it is required of $\mdef$ that, when given an item $\itm'$ challenging an item $\itm \in \mitems$ considered by $\eta$ as being in the \ac{DP} of $i$, $\mdef$ produces an argument that successfully defends $\itm$, whatever the argument given in favor of $\itm'$. More precisely and completely, an \ac{AR} $\eta$ is said to be \emph{correct} about a user $\usr$ iff $\forall \itm \in \mitems, \itm' \in \allitems, \ar' \in \allargs: (\itm', \ar') \nibeats (\itm, \mdef(\itm, \itm'))$ and $\forall (\itm, \itm') \in R_\eta, \ar' \in \allargs: (\itm, \matt(\itm, \itm')) \ibeats (\itm', \ar')$. An \ac{AR} is \emph{valid} iff it is correct about all users in its scope.
+Formally, an \ac{ARS} $\eta$ has a \emph{scope} $\allusers$, a set of users it claims to be able to predict the deliberated preference of, and gives, for a user $\usr \in \allusers$, a tuple $(\mitems, \mdef, R_\eta, \matt)$, where $\mitems \subseteq \allitems$ is a set of items that $\eta$ claims are among the deliberated preference of $\usr$, $\mdef: \mitems × \allitems → \allargs$ is an argumentation strategy used to defend items in $\mitems$, $R_\eta \subseteq \allitems × \allitems$ is a binary relation that contains pairs of items $(\itm, \itm')$ such that $\eta$ claims that $\usr$ deliberately prefers $\itm$ to $\itm'$, and $\matt: R_\eta → \allargs$ is an argumentation strategy used to support the claims represented by $R_\eta$.
 
-Importantly, validity implies the correctness of the claims concerning the \ac{DP} of $\usr$. This fact is stated formally below, with $\mnitems = R_\eta(\allitems) = \set{\itm' \in \allitems \suchthat (\itm, \itm') \in R_\eta \text{ for some } \itm \in \allitems}$. (The proof is omitted.)
+To ensure that an \ac{ARS} is valid, we require that its functions $\mdef$ and $\matt$ indeed justify its claims, in the following sense. An \ac{ARS} $\eta$ is said to be \emph{correct} about a user $\usr$ iff $\forall \itm \in \mitems, \itm' \in \allitems, \ar' \in \allargs: (\itm', \ar') \nibeats (\itm, \mdef(\itm, \itm'))$ and $\forall (\itm, \itm') \in R_\eta, \ar' \in \allargs: (\itm, \matt(\itm, \itm')) \ibeats (\itm', \ar')$. An \ac{ARS} is \emph{valid} iff it is correct about all users in its scope.
+
+Importantly, validity implies the correctness of the claims concerning which items belong or do not belong to the deliberated preference of $\usr$. This fact is stated formally below. (The proof is omitted.)
 \begin{fact}
-	If an \ac{AR} $\eta$ is valid, then $\forall \usr \in \allusers: \mitems \subseteq \uitems \text{ and } \mnitems \subseteq \allitems \setminus \uitems$.
+	If an \ac{ARS} $\eta$ is valid, then $\forall \usr \in \allusers: \mitems \subseteq \uitems \text{ and } \mnitems \subseteq \allitems \setminus \uitems$, where $\mnitems = R_\eta(\allitems) = \set{\itm' \in \allitems \suchthat (\itm, \itm') \in \R_\eta \text{ for some } \itm \in \allitems}$.
 \end{fact}
 
-This notion of validity can be used to \emph{compare} \acp{AR}, in the following way. Given two \acp{AR} $\eta$ and $\eta'$, consider a user $\usr$ in both their scopes and obtain two tuples, $(\mitems, \mdef, R_\eta, \matt)$ and $(\mitems[\eta'], \mdef[\eta'], R_{\eta'}, \matt[\eta'])$. Assume they strongly disagree on the prediction of the \ac{DP} of $\usr$, meaning that for some item $\itm \in \allitems$, the first system claims that $\itm$ is in the \ac{DP} of $\usr$, thus $\itm \in \mitems$, and the second system claims it is not, thus $\exists \itm' \suchthat (\itm', \itm) \in R_{\eta'}$. Suffices now to let the two systems play against each other and use $\usr$ as a judge. That is, we obtain an argument from the first system in defense of its claim, $\ar = \mdef(\itm, \itm')$, and an argument from the second system, $\ar' = \matt[\eta'](\itm', \itm)$. We present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and accordingly obtain $(\itm', \ar') \ibeats (\itm, \ar)$ or $(\itm', \ar') \nibeats (\itm, \ar)$. In the first case, the first system is invalidated, in the second one, the second system is invalidated.
+Validity can’t be operationally checked if $\allargs$ is too large to allow for an exhaustive verification. We propose to use this notion of validity to \emph{compare} \acp{ARS}, in the following way. Given two \acp{ARS} $\eta$ and $\eta'$, consider a user $\usr$ in both their scopes and obtain two tuples, $(\mitems, \mdef, R_\eta, \matt)$ and $(\mitems[\eta'], \mdef[\eta'], R_{\eta'}, \matt[\eta'])$. Assume they strongly disagree on the prediction of the deliberated preference of $\usr$, meaning that for some item $\itm \in \allitems$, the first system claims that $\itm$ is in the deliberated preference of $\usr$, and the second system claims it is not. Thus, assume that $\itm \in \mitems$ and $\exists \itm' \suchthat (\itm', \itm) \in R_{\eta'}$. Suffices now to let the two systems play against each other and use $\usr$ as a judge. That is, we obtain an argument from the first system in defense of its claim, $\ar = \mdef(\itm, \itm')$, and an argument from the second system, $\ar' = \matt[\eta'](\itm', \itm)$. We present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and accordingly obtain $(\itm', \ar') \ibeats (\itm, \ar)$ or $(\itm', \ar') \nibeats (\itm, \ar)$. In the first case, the first system is falsified, in the second one, the second system is falsified.
 
 \section{Recommend on the basis of explicit principles}
-\label{sec:princ}
-Consider a collaborative learning setting, where we have collected ratings from users on items, assumed to represent their intuitive rather than deliberated preference. 
-A simple approach to build a proof-of-concept \ac{AR} in such a context is to represent the \ac{DP} of $\usr$ as a weak order ${\succeq} \subseteq \allitems × \allitems$ corresponding to $R_\eta$ and whose maximal elements correspond to $\mitems$ (though the definition tolerates other possibilities).
-Assume that the \ac{DP} of the user can be represented by a decision-theoretic model: because such models are conceived for grounding decisions in sound principles, they might be adequate to model deliberated preferences. % (as opposed to intuitive ones). %DEL?
-For concreteness, assume it is \ac{MAVT} \citep{keeney_decisions_1993}, a set of principles for choice well-known in decision theory.
+A simple approach to build an initial \ac{ARS} is to represent the deliberated preference of $\usr$ as a weak order $\succeq \subseteq \allitems × \allitems$, meaning a complete (thus reflexive) and transitive binary relation, whose maximal elements correspond to $\uitems$. (Note however that our definition tolerates other possibilities.)
+Furthermore, 
+we propose here to use \ac{MAVT}, a well-known set of principles for choice coming from decision theory, as a basis for our proof-of-concept \ac{ARS}. This provides us with a class of functions among which to select an optimal one during learning.
 
-Existing works \citep{carenini_generating_2006, labreuche_general_2011} describe how to generate arguments in natural language that explain, on the basis of an \ac{MAVT} model, why an alternative is preferred to another one. This provides a starting point for the step of generating arguments.
-More generally, by picking functions supported by well-studied decision principles, it is made possible to build arguments on the basis of those same principles, and it might be considered that such arguments will have a fighting chance against counter-arguments.
+We assume we are in a collaborative learning setting, where we have collected observed choices from users, assumed to represent their intuitive rather than deliberated preference. 
+As a simplification, we assume that the usual behavior of the user is a noisy version of her deliberated preference. Thus, we will attempt to learn the \ac{MAVT} model that fits as closely as possible her usual behavior. 
 
-Finally, assume the intuitive behavior of the user is a noisy version of her \ac{DP}. (More elaborated developments would incorporate knowledge from experimental psychology about differences between the usual behavior of users and the one dictated by decision-theoretic models \citep{kahneman_thinking_2013}.)
-Then, our task becomes close to one of classical collaborative learning, as \ac{MAVT} defines the class of functions among which to select an optimal one during learning.
+It might seem odd that we restrict the optimization to a class of functions that represent (arguably) sound decision principles rather than the classes of functions more usually used in machine learning that have a higher chance of fitting the observed or future raw preference data. This is because the goal of an \ac{ARS} is to predict deliberated preference, and those might differ from the observed ones. It is important for an \ac{ARS} to be able to argue for its claims, using arguments that the user will find convincing, even more than to fit the raw data given as training set, as validation is performed on its ability to argue. By picking functions supported by well-studied decision principles, it is made possible to build arguments on the basis of those same principles, and it might be reasonable to think that such arguments will have a fighting chance against counter-arguments.
 
-The principles on which \ac{MAVT} rests are applicable in specific contexts: those in which the items among which the user aims to choose can be exhaustively described by a set of objective descriptors of the items, known a priori, and which each evaluate the desirability of the items on some aspect. Such aspects are called criteria. Exhaustively described means that the user considers nothing else than the performance of the items on the criteria as relevant for the recommendation.
-Thus, consider a set of criteria $\crits$ is known, together with corresponding scales $X_c, c \in \crits$ and descriptors $b_c: \allitems → X_c, c \in \crits$, that each describe the items on a specific criterion $c$.
+We do not however detail the process of argument generation in this article. Existing literature \citep{carenini_generating_2006, labreuche_general_2011} proposes to generate arguments in natural language that explain, on the basis of an \ac{MAVT} model, why an alternative is preferred to another one given this model and could provide a starting point for this step. 
 
-In such a context, an \ac{MAVT} model representing $\succeq$ is a set of functions $v_c: X_c → \R$ (one for each criterion) such that $\itm \succeq \itm'$ iff $\sum_{c \in C} v_c(b_c(\itm)) ≥ \sum_{c \in C} v_c(b_c(\itm'))$.
+We are interested in this section in defining \ac{MAVT} and in giving sufficient conditions for being able to represent the relation $\succeq$ (defined here above) as an \ac{MAVT} model.
 
-Consider as an example the choice of an apartment to rent for holidays. The set of criteria might be: surface of the living room, number of beds, distance to city center, modernity of equipment, presence of a washing machine, price. 
-%A minimal condition for these criteria to be appropriate for building an \ac{MAVT} model for a user $\usr$ is that, when two apartments are equally valued on all these criteria (have the same surface of the living room, the same number of beds, and so on), they are equally recommendable. Thus, the set of criteria must completely describe the desirability of an apartment.
-Other examples where building an \ac{AR} on the basis of an \ac{MAVT} model may be appropriate include: buying a smartphone, buying a computer, choosing a flight to reach a given place, choosing who to give a “best student” award among a given classroom, locating a new factory, or choosing a university to study at.
+The principles on which \ac{MAVT} rests are applicable in specific contexts, to which we now focus our attention. In our case of interest, the items among which the user aims to choose can be exhaustively described by a set of objective descriptors of the items, known a priori, and which each evaluate the desirability of the items on some aspect. Such aspects are called criteria. Exhaustively described means that nothing else than the performance of the items on the criteria is considered relevant for the recommendation by the user.
 
-By contrast, a recommendation task is not suitable for the approach proposed here if no set of criteria is known that fully describe the desirability of an item. For example, a choice of movie to watch this evening. %Note that a movie is certainly describable on some set of descriptors (for example, the singleton set including its serial number, or a set including its title, release date, and other attributes that together uniquely identify a movie), but those are not criteria as defined above, as those descriptors do not each evaluate the desirability of a movie on some aspect.
+Thus, we consider we are given a set of criteria $\crits$, and corresponding scales $X_c, c \in \crits$ and descriptors $b_c: \allitems → X_c, c \in \crits$, that each describe the items on a specific criterion $c$.
 
-%The literature has deeply investigated necessary and sufficient conditions for an \ac{MAVT} model to exist that represent $\succeq$ \citep{k, gonzales}, which will be useful to assess whether it seems reasonable to 
+In such a context, an \ac{MAVT} model representing $\succeq$ is a set of functions $v_c: X_c → \R$ (one for each criterion) such that $\usr$ prefers $\itm$ to $\itm'$ iff $\sum_{c \in C} v_c(b_c(\itm)) > \sum_{c \in C} v_c(b_c(\itm'))$.
 
-\section{Relation to existing literature}
-\label{sec:litt}
-Approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior \citep{greco_trends_2010, sobrie_learning_2018}. 
-Furthermore, numerous approaches have been proposed for modeling preferences using machine learning methods \citep{furnkranz_preference_2010}. Both these trends constitute promising areas of investigation for building \acp{AR}.
-The idea of using a human as a judge to compare argumentative systems also appears in the paper of \citep{irving_ai_2018}.
+Consider as an example the choice of an apartment to rent for holidays. The set of criteria might be: surface of the living room, number of beds, distance to city center, modernity of equipment, presence of a washing machine, price. A minimal condition for these criteria to be appropriate for building an \ac{MAVT} model for a user $\usr$ is that, when two apartments are equally valued on all these criteria (have the same surface of the living room, the same number of beds, and so on), they are equally recommendable. Thus, the set of criteria must completely describe the desirability of an apartment.
+
+Other examples where building an \ac{ARS} on the basis of an \ac{MAVT} model may be appropriate include: buying a smartphone, buying a computer, choosing a flight to reach a given place, or even, possibly, choosing who to give a “best student” award among a given classroom, locating a new factory, or choosing a university to study at.
+
+By contrast, a recommendation task is not suitable for the approach proposed here if no set of criteria is known that fully describe the desirability of an item. For example, a choice of movie to watch this evening. Note that a movie is certainly describable on some set of descriptors (for example, the singleton set including its serial number, or a set including its title, release date, and other attributes that together uniquely identify a movie), but those are not criteria as defined above, as those descriptors do not each evaluate the desirability of a movie on some aspect.
+
+\subsection{Sufficient conditions for an MAVT representation}
+Condition 1: the descriptors $\{b_c, c \in \crits\}$ are such that whether $\itm \succeq \itm'$ depend only on the descriptions on the items according to $\set{b_c, c \in \crits}$.
+
+In the sequel we treat $\succeq$ as a relation over $X = \prod_{c \in \crits} X_c$, which we can do thanks to condition 1.
+Define $\sim$ as the symmetric part of $\succeq$ and $\succ$ its asymmetric part.
+Thus, $\sim$ is an equivalence relation.
+
+Our second condition mandates that comparisons between two items that have the same value on some descriptor do not change if that value changes equally for both items (thus, the comparison must be independent of that value provided it is equal on both items). For example, if the user deliberately prefers a flat that is 50 meters square and has a washing machine to a flat that is 60 meters square but has no washing machine, given that both flats are priced 500 € (and assuming only these three criteria matter), then the user has the same deliberated preference ordering for two flats that have the same characteristics except that they are both priced 800 €.
+
+With $C = \crits \setminus \{c\}$ for some $c \in \crits$, thus $C$ contains all criteria but one, let $X_C = \prod_{d \in C} X_d$, and let $(x_C, w_c) \in X$ represent the performance of an item $\itm \in \allitems$ where $x_C \in X_C$ describes the item $\itm$ on the criteria $C$ and $w_c \in X_c$ is the remaining description. %Similar notation is used when $C$ contain all criteria but two.
+
+Condition 2: $\forall C = \crits \setminus \{c\}, w_c, z_c \in X_{c}, x_C, y_C \in X_C: (x_C, w_c) \succ (y_C, w_c) ⇒ (x_C, z_c) \succ (y_C, z_c)$.
+
+Our last two conditions are more technical. First, the set of possible items must be rich enough. We say that a criterion $c$ is solvable iff, with $C = \crits \setminus \{c\}$, for all $x \in \allitems$ and $y_C \in X_C$, there exists $z_c \in X_c$ such that $x \sim (y_C, z_c)$.
+
+Condition 3: there are at least three solvable criteria.
+
+In the example of a choice of a flat, three solvable criteria might be the size of the flat in meter squares, its price, and its distance to the city center. The presence of a washing machine is a non solvable criterion.
+
+The second technical and last condition is an archimedian requirement. In loose terms, we want to forbid that some item be infinitely far away, in the sense that the item would be preferred to an infinite sequence of equally spaced items. Given a criterion $c$, with $C = \crits \setminus \{c\}$, given $y_C, z_C \in X_C$, we say that $y_C$ and $z_C$ are not indifferent iff there exists some $x_c \in X_c$ such that not $(x_c, y_C) \sim (x_c, z_C)$ (note that by Condition 2, this “exists” is equivalent to a “for all”). Given $c \in \crits, C = \crits \setminus \{c\}$, we say that an infinite sequence of values in $X_c$ is equally spaced iff there exists $y_C, z_C \in X_C$ not indifferent such that for any two consecutive elements $x_c, x'_c$ in the sequence, $(x_c, y_C) \sim (x'_c, z_C)$. Furthermore, such a sequence is bounded iff there exists an item that is strictly deliberately preferred to $(x_c, y_C)$ for every $x_c$ in the sequence.
+
+Condition 4: There exists a solvable criterion $c$ such that there is no infinite sequence of values in $X_c$ that is equally spaced and bounded.
+
+\begin{thm}
+	Given a set of items $\allitems$, a set of criteria $\crits$, scales $X_c$ and descriptors $b_c: \allitems → X_c, c \in \crits$, and $\succeq$ a binary relation over $\allitems$, if the four conditions above are satisfied, then an \ac{MAVT} model representing $\succeq$ exists.
+\end{thm}
+
+\section{Estimating an MAVT model}
+Assume we have a set of users $I$ of size $m \in \N$, a set of items $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\intvl{1, 5}$ (throughout the article, this notation designates intervals in the integers). 
+We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$: user $i$ is described by $a_i \in A$. 
+The items are described by a set of descriptors whose indices are in $\mathcal{C} = [[1, …, c, …, d]]$. The descriptor $B_c: J → X_c, B_c \in \mathcal{B}$ evaluates each item according to a scale $X_c$. 
+%We also write $B_{cj}$ for $B_c(j)$, viewing the description information as encoded in a matrix $B$. 
+Let $X = \prod_{c \in \mathcal{B}}$ denote the cardinal product space where descriptions of items lie, and let $b_j \in X$ denote the description of an item $j$.
+
+\subsection{Classical collaborative learning}
+In classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
+
+\subsection{Using given knowledge}
+However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
+
+We could define $u_i = W_A a_i$ and $v_j = W_B b_j$ and obtain $r_{ij} \approx a_i^T (W_A^T W_B) b_j$, thus we could optimize by searching for the best $(W_A^T W_B)$. But as this could be too constrained, we will also try to relax these constraints and search for a representation that takes into account that $u_i$ should be close to $W_A a_i$, but not necessarily equal.
+
+\subsection{Predict ratings with logits}
+Assume we are given a loss function $L$ that compares the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$.
+
+Define $\sigma(\alpha, \beta, x) = \frac{1}{1+\alpha e^{-\beta x}}$.
+
+We want to find $\{w_i^c, i \in I, c \in \mathcal{C}\}, \{\alpha^c, c \in \mathcal{C}\}, \{\beta^c, c \in \mathcal{C}\}$ that optimize the following objective:
+\begin{equation}
+\min_{w, \alpha, \beta} \sum_{(i, j) \in O} L(r_{ij}, \sum_{c \in \mathcal{C}} w_i^c \sigma(\alpha^c, \beta^c, b_j^c)) + \lambda \sum_{i, c} \norm{w_i^c}_2^2.
+\end{equation}
+We force $w$ positive. And $\alpha$ is forced positive to respect the preference direction: we assume the data is encoded so that higher $b_j^c$ means preferred performance. Where $b_j^c$ is the performance of item $b_j$ on criterion $c$.
+
+\subsection{Predict ratings}
+We could want to check whether we are able to predict the right ratings. In that case, we would assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
+
+We would want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
+\begin{equation}
+\min_{U, V, W_A, W_B} \sum_{(i, j) \in O} L(r_{ij}, u_i^T v_j) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
+\end{equation}
+
+\subsection{Predict orders}
+We are interested in comparing our predictions to orderings (because that’s what we have underhand).
+
+We assume we are given loss function $L$, that compares preorders (transitive and reflexive binary relations), and $L_I$ and $L_J$, as above. We assume we have a preorder $≥_i$ for each user indicating her true preference over some pairs of items among $J$.
+
+We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
+\begin{equation}
+\min_{U, V, W_A, W_B} \sum_{i \in i} L(≥_i, \set{(v_j, v_{j'}) \suchthat u_i^T v_j ≥ u_i^T v_{j'}}) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
+\end{equation}
+
+\subsection{Data set: Sushi}
+We experiment using the Sushi data set (ref…)
+
+Here $J$ is a set of $100$ sushi types \footnote{$X^*=X_B$ in the original notation.}. The original authors collected the sushi from the menu of 25 restaurants, computed the frequency of each sushi type occurring on a menu, and took the $100$ most frequent. Write $P_J$ the frequency (thus a multiple of $1/25$).
+
+Write $J_\text{top} \subset J$ the $10$ most frequent sushi types \footnote{$X_A$}.
+
+The set $I$ has cardinal $m = 5000$. The authors drew randomly a set of 10 sushi types among $J$, for each user $i$, according to the distribution $P_J$. Let us denote this by $J_i \subset J$ \footnote{$X^B_i$}.
+
+The authors obtained, for each user $i$ in $I$, three preferential informations, defined as strict partial orders (transitive, asymmetric binary relations). First, they collected a preference ordering over the sushi types from $J_\text{top}$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering \footnote{$O^A_i$} (“top” designates the fact that the ordering is over the 10 most frequent sushi types). Second, they collected a rating, in $\intvl{1, 5}$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user think each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ \footnote{$O^B_i$} (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
+
+Users are described in a space $A$ comprising the attributes $\{$gender, age category, origin-prefecture, origin-region, origin-east/west (binary), current-region, current-east/west (binary), origin-prefecture$\}$. Items are described in a space $B$ comprising the attributes $\{$group, heaviness/oiliness in taste (in $[0, 4]$), frequency of eating (in $[0, 3]$), normalized price (in $[0, 1]$), $P_J(j)$$\}$.
+
+We summarize the preference of $i$ as follows. The ratings over $J_i$ are transformed to preorders $≥^\text{rating}_i$ that tolerate ex-æquos, in the obvious way (better ratings indicate preference). We then merge, for each user $i$, all preferential information, considering contradictions as indicating indifference, and obtain a preorder $≥_i = [≥^\text{rating}_i ∪ >^\text{top}_i ∪ >^\text{indiv}_i]$, where the brackets designate taking the transitive closure and adding the identity relation (to obtain reflexivity). For example, if $>^\text{top}_i$ represents the ordering $(j_1 > j_2 > j_3)$ and $>^\text{indiv}_i$ represents $(j_6 > j_3 > j_4 > j_2)$ and $≥^\text{rating}_i = \emptyset$, then $≥_i$ considers $j_1$ and $j_6$ as strictly preferred to $j_2$ to $j_4$, $j_2$ to $j_4$ ex-æquos, and $j_1$ incomparable to $j_6$.
+
+\section{Discussion}
+\subsection{The need for another notion of preference}
+In this article we are interested in a notion of preference that possibly changes when confronted to arguments. That is, we assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind when presented with arguments in favor of, or counter-arguments against, various items. 
+
+By contrast, the notion of preference considered by classical recommender systems (usually left implicit) in the collaborative learning literature is that the user intuitively knows what he prefers, and that this is the right basis for him to decide. This notion can be related to the conception of preference put forth by \citet{von_neumann_theory_2004} in 1944 in their seminal work. They write that “It is clear that every measurement – or rather every claim of measurability – must ultimately be based on some immediate sensation, which possibly cannot and certainly need not be analyzed any futher. In the case of utility the immediate sensation of preference – of one object or aggregate of objects as against another – provides this basis (…) Let us for the moment accept the picture of an individual whose system of preferences is all-embracing and complete, i.e. who, for any two objects or rather for any two imagined events, possesses a clear intuition of preference. More precisely we expect him, for any two alternative events which are put before him as possibilities, to be able to tell which of the two he prefers.” When applied to collaborative filtering, this view suggests that the job of the system is to help the user single out which items are the best among all the possible ones (to relieve the user from having to search through the whole set). The user, once presented a pair of items (for example, a pair of movies), will know which one he prefers by simple introspection, possibly after having tried them both. Thus, although the user might need help for efficiently searching through a big set of items, he does not need help for the task of comparing a pair of item. Similarly, when the user has already provided some comparisons of preference, this is the final word about those pairs. (Admittedly, it is common to say that a user may make mistakes when reporting her preference, but what this means is usually not specified, and not much is done with this fact, as far as we know, in the literature of collaborative learning.)
+
+We claim that this notion of preference, that we call intuitive preference, is not always the best basis to ground recommendation. Indeed, the user might be unwilling to judge what is best for her on the sole basis of her unaided intuition. First, there are cases where the user can’t easily try out the items. An example is a non repeatable choice, such as choosing a university to study in. Second, in some situations, a notion of fairness is involved, or a similarly abstract notion not easily accessible by non-reflexive perception, such as determining who will receive a prize, or how to best distribute revenue in a society, or to which cause I should donate money. Third, even excluding moral considerations, the best choice might be the result of a complex thought process that should better ensure, as much as possible, that all relevant arguments have been considered, rather than rely on intuition. Consider the decision of which smartphone, or which computer, or which house, to buy. Fourth, the user might appreciate being pointed to some non-salient feature of the items under comparison: for example, a user might feel an intuitive attraction to the plane alternative when chosing a transportation means for holidays, seeing that the flight time is only one hour compared to three hours by train, but change her mind when being reminded that the total travel time should be taken into account. Finally, an important argument coming from psychology can be given in favor of considering arguments rather than intuitive preference to decide on what’s best (in some contexts). It is that unaided intuition is known to be sensible, in some contexts, to framing effects that would perhaps not be considered relevant (by the user himself) when considering arguments and counter-arguments. An example that involves several kinds of the just enumerated concerns is obtaining a procedure to determine to which client a bank should lend money: first, the user probably wants to involve fairness considerations in order to avoid unjust discriminations (which might unconsciously appear if using unaided intuition); second, even if only pure profit considerations are to bear, the user might want the procedure to go beyond reflecting the bare intuition of an expert.
+
+\subsection{About the definition of the situation}
+The notion of deliberated preference is a simplification of the recently proposed concept of deliberated judgement \citep{cailloux_formal_2017}, applied to the notion of preference (instead of the less specific notion of judgement), and instanciated for collaborative learning.
+
+We insist, to avoid turning recommendation into persuasion or manipulation, that the set of all arguments $\allargs$, in our conception, must not be restricted to arguments judged as good arguments from some external point of view, but should contain a wide range of arguments that can possibly be considered by various (possibly disagreeing) sources as possibly influencing $\usr$.
+
+The relation $\ibeats$ is what plays in our approach the role of the basic observable \citeauthor{von_neumann_theory_2004} talk about.
+There are multiple ways of instantiating the experiment represented by $\ibeats$, for example, we may consider stated attitude or revealed attitude, and we have to choose some way of presenting the arguments to $\usr$; those various ways would possibly define different deliberated preferences.
+Alternatively, the deliberated preference of a user could be considered as consisting in those items that resist counter-arguments considering various ways of presenting arguments.
+We do not discuss here the difficulties related to distinguishing strict preference from indifference in revealed preference approaches, and consider (as a possibly somewhat simplistic assumption) that strict preference can be equated to a willingness to pay a small amount to switch from one item to the preferred one, or that the experiment can be repeated and that strict preference holds if a systematic choice is observed \citep{danan_revealed_2008}.
+
+We do not mandate that \acp{ARS} be able to determine all the items in the deliberated preference of a user, but merely that the items it claims are in the deliberated preference of a user be indeed, and that its proofs of this fact be valid, and similarly for the items claimed as not belonging to the deliberated preference of a user. This is for two reasons: our requirement is enough to have a possibly useful system (provided $\mitems ≠ \emptyset$), and being able to completely predict the deliberated preference of a user might be extremely difficult. 
+
+\acp{ARS} may have very few claims, and accordingly, may have a low chance of being falsified (as an extreme case, an \ac{ARS} that claims nothing is unfalsifiable). This reflects the usual difficulty that scientists face: general theories are better, but more difficult to get right.
+
+\subsection{Relation to existing literature}
+Other approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior, thus, our proposal is not new in this respect. What is new is our proposal of a research agenda to develop such models not because they would best predict the user’s normal behavior, but because they could best describe her deliberated judgment; and our instanciation to collaborative learning.
+
+Some approaches suggest to directly optimize the model for predicting a ranking rather than predict best items \citep{rendle_bpr:_2009}, when the task amounts to predict a ranking. In our case, we aim at predicting best items and not rankings. Moreover, our model is targeted to learn an MAVT model in order to be able to predict the items in the deliberated preference of the user, rather than her intuitive preference, which traditional approaches do not attempt to do.
+
 There are also articles that are interested in using collaborative filtering on the basis of implicit feedback \citep{rendle_bpr:_2009, hu_collaborative_2008}, an idea somewhat related to ours in the sense that the observed data is not directly the one the model tries to predict.
-Also somewhat related are articles interested in collecting preference data for improving the learning \citep{sepliarskaia_preference_2018}.
-An important literature analyzes necessary and sufficient conditions for the existence of various decision-theoretic models \citep{krantz_foundations_1971, gonzales_additive_1996, bouyssou_consolidated_2015}.
-Finally, this proposal is intimately related to the important literature on explainable AI \citep{DBLP:journals/corr/abs-1804-11192}.
 
-\textbf{Acknowledgements} I thank Florian Yger and Jill-Jênn Vie for insightful discussions and the CNRS PEPS program for financial support.
+Also somewhat related are articles that are interested in collecting preference data for improving the learning \citep{sepliarskaia_preference_2018}.
+
+\citet{johnson_logistic_2014} also uses logits for matrix factorization. \citet{chen_attribute-aware_2018} review techniques that make use of supplementary data in collaborative filtering tasks.
+
+\subsection{Going beyond}
+More elaborated developments of our proposal would incorporate biases known from experimental psychology to systematically attempt to correct possible mistakes of the user (the word “mistake” referring to the difference between her usual behavior and her own deliberated judgment).
 
 \bibliography{clut,manual}
 
 \appendix
-\section{Discussion}
-\label{sec:disc}
-%\subsection{The need for another notion of preference}
-This article discusses a notion of preference that possibly changes when confronted to arguments. That is, I assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind when presented with arguments in favor of, or counter-arguments against, various items. 
+\section{Double-strategy}
+In the double-strategy, we use different dimensions: $k = d_{A'} + d_U = d_{B'} + d_V$.
+The matrix $W_A$ has size $(d_{A'}, d_A)$ and $U$ has size $(m, d_U)$. $W_B$ has size $(d_{B'}, d_B)$ and $V$ has size $(d_V, n)$. $r_{ij} = \mu_i^T \nu_j$ where $\mu_i$ is the $k$-dimensional vector composed of $W_A a_i$ then $u_i$ and $\nu_j$ is composed of $W_B b_j$ then $v_j$.
 
-By contrast, the notion of preference considered by classical recommender systems (usually left implicit) is that the user intuitively knows what he prefers, and that this is the right basis for him to decide. This notion can be related to the conception of preference put forth by \citet[p. 16]{von_neumann_theory_1944} in their seminal work. They write that “It is clear that every measurement – or rather every claim of measurability – must ultimately be based on some immediate sensation (…). In the case of utility the immediate sensation of preference (…) provides this basis.” When applied to collaborative filtering, this view suggests that the user does not need help for comparing pairs of item: the job of the system is merely to relieve the user from having to search through the whole set. 
-The user, when presented with a pair of items, knows which one he prefers by introspection, possibly after having tried them both. %DEL?
-Similarly, when the user has already provided some comparisons of preference, this is the final word about those pairs.
+We should compare this approach to the more classical one.
 
-This notion of preference as “intuitive” preference is not always the best basis to ground recommendation. Indeed, the user might be unwilling to judge what is best for her on the sole basis of her unaided intuition. First, there are cases where the user can’t easily try out the items. An example is a non repeatable choice, such as choosing a university to study in. 
-Second, the best choice might be the result of a complex thought process that should better ensure, as much as possible, that all relevant arguments have been considered, rather than purely rely on intuition.
-Consider the decision of which smartphone, or which computer, or which house, to buy. 
-This is also easily the case when a notion of fairness is involved, for example when determining who will receive a prize, or how to best distribute revenue in a society, or to which cause I should donate money.
-Third, the user might appreciate being pointed to some non-salient feature of the items under comparison; for example, a user might feel an intuitive attraction to the plane alternative when chosing a transportation means for holidays, seeing that the flight time is only one hour compared to three hours by train, but change her mind when being reminded that the total travel time should be taken into account. Finally, an argument coming from psychology is that unaided intuition is known to be sensible, in some contexts, to framing effects that would perhaps not be considered relevant (by the user himself) when considering arguments and counter-arguments \citep{kahneman_thinking_2013}. An example that involves several kinds of the just enumerated concerns is obtaining a decision procedure for credit requests in a bank: the user probably wants to involve fairness considerations in order to avoid (unconscious) appearance of unjust discriminations; and even if only profit considerations are to bear, the user might want the procedure to go beyond reflecting the bare intuition of an expert.
-Therefore, the relation $\ibeats$ plays here the role of the basic observable \citeauthor{von_neumann_theory_1944} talk about.
+\section{Using raw item descriptions}
+The matrix $W_B$ could be constrained to having mostly zeroes, to make sure that indeed the attributes of the items ($b_j$) are used in their $\mu$-vectorial description. We could even take $d_{B'} = d_B$ and take $W_B$ equal to identity. (Is there any benefit not to do so?)
 
-I do not mandate that \acp{AR} be able to determine all the items in the \ac{DP} of a user, but merely that the items it claims are in the \ac{DP} of a user be indeed, and that its proofs of this fact be valid, and similarly for the items claimed as not belonging to the \ac{DP} of a user. This is for two reasons: this requirement suffices to yield possibly useful systems (provided $\mitems ≠ \emptyset$), and being able to completely predict the \ac{DP} of a user might reveal extremely difficult. 
-As a consequence, \acp{AR} may have very few claims and, correspondingly, face low risks of falsification (as an extreme case, an \ac{AR} that claims nothing is unfalsifiable). This reflects a usual tradeoff in science: general theories are better, but more difficult to get right.
+This suggests the following simple approach: concatenate $b_j$ to $v_j$ to obtain $\nu_j$. Don’t use $W_B$. Obtain $\mu_i$ of size $k = d_B + d_V$, using $W_A a_i$ as its first components.
 
-In order to avoid turning recommendation into persuasion or manipulation, 
-it is important that the set of all arguments $\allargs$ be not restricted to arguments judged as good arguments from some unique point of view, but rather contains a wide range of arguments promoted by (possibly disagreeing) sources. Accordingly, diverse \acp{AR} should be compared for a given problem in order to span the relevant arguments.
+\section{Factorization machines}
+We should compare (theoretically or experimentally) our approach to factorization machines.
+
 \end{document}
+
