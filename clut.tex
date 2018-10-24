@@ -27,6 +27,10 @@
 \makeatother
 \maketitle
 
+\abstract{
+Recommender systems aim at recommending some item as most appropriate for the user. This article introduces a new way of measuring appropriateness for the user: an item is among the most appropriate ones if it is among the preferred items of the user when considering all arguments in favor or against all possible items. I describe precisely this goal and describe what a recommender system aiming for that goal could look like, called an \acl{AR}. I also provide a way of measuring whether a recommender system has achieved the goal, which can be used to compare such recommender systems, and briefly outline a way of building such a system.
+}
+
 \section{Introduction}
 In a situation where a user has to choose an item among a set of possible items, recommender systems aim at recommending some item as most appropriate for the user.
 In the collaborative learning community, this is usually taken to mean: recommend an item among the most preferred for the user. In this article, I want to propose another goal for recommender systems. I keep the global aim of recommending some item as most appropriate for a given user, but I propose a different understanding of appropriateness. The goal I propose is to recommend an item among those that are in the \ac{DP} of the user, and to prove that it does. The \ac{DP} of the user captures what she prefers when considering all arguments in favor or against all possible items. This differs from her intuitive preference in that the latter does not consider arguments. Thus, the goal I propose is appropriate when one is interested to help the user form a deliberated judgment about which item is best, rather than predict which item the user intuitively prefers. Because this will be done using systems that argue, I call the kind of system I define here an \ac{AR}.
@@ -124,7 +128,7 @@ As a consequence, \acp{AR} may have very few claims and, correspondingly, face l
 Second, in order to avoid turning recommendation into persuasion or manipulation, 
 it is important that the set of all arguments $\allargs$ be not restricted to arguments judged as good arguments from some unique point of view, but rather contains a wide range of arguments promoted by (possibly disagreeing) sources. Accordingly, diverse \acp{AR} should be compared for a given problem in order to span the relevant arguments.
 
-\section*{Acknowledgements} I thank Florian Yger and Jill-Jênn Vie for insightful discussions, two anonymous reviewers for helpful comments and the CNRS PEPS program for financial support.
+\section*{Acknowledgements} I thank Florian Yger and Jill-Jênn Vie for insightful discussions, two anonymous reviewers for helpful comments and the CNRS PEPS program for financial support of the El-JuDe project.
 
 \bibliography{clut,manual}
 
