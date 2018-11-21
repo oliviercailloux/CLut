@@ -1,0 +1,90 @@
+%Requires package xcolor.
+\newcommand{\commentOC}[1]{\textcolor{blue}{\small$\big[$OC: #1$\big]$}}
+%Requires package babel and option [french]. According to babel doc, need two braces around \selectlanguage to make the changes really local.
+\newcommand{\commentOCf}[1]{\textcolor{blue}{{\small\selectlanguage{french}$\big[$OC : #1$\big]$}}}
+\newcommand{\commentYM}[1]{\textcolor{red}{\small$\big[$YM: #1$\big]$}}
+\newcommand{\commentYMf}[1]{\textcolor{red}{{\small\selectlanguage{french}$\big[$YM : #1$\big]$}}}
+
+%TODO \crefname{axiom}{axiom}{axioms}%might be needed for workaround bug in cref when defining new theorems?
+\crefname{examplex}{example}{examples}% I wonder why this is unnecessary in case of singular
+
+%I find these settings useful in draft mode.
+%Which line breaks are chosen: accept worse lines, therefore reducing risk of overfull lines. Default = 200.
+	\tolerance=2000
+%Accept overfull hbox up to...
+	\hfuzz=2cm
+%Reduces verbosity about the bad line breaks.
+	\hbadness 5000
+%Reduces verbosity about the underful vboxes.
+	\vbadness=1300
+
+\bibliographystyle{abbrvnat}
+
+%TODO test the brackets.
+%\newcommand{\llbracket}{\lbrack\!\lbrack}
+%\newcommand{\rrbracket}{\rbrack\!\rbrack}
+
+%2212 Minus Sign
+\newunicodechar{−}{\ifmmode{-}\else\textminus\fi}
+%These symbols can only be used in math mode, for I found no text equivalent.
+%03B3 Greek Small Letter Gamma
+\newunicodechar{γ}{\gamma}
+%03B4 Greek Small Letter Delta
+\newunicodechar{δ}{\delta}
+%2115 Double-Struck Capital N
+\newunicodechar{ℕ}{\mathbb{N}}
+%211D Double-Struck Capital R
+\newunicodechar{ℝ}{\mathbb{R}}
+%21CF Rightwards Double Arrow with Stroke
+\newunicodechar{⇏}{\nRightarrow}
+%21D2 Rightwards Double Arrow
+\newunicodechar{⇒}{\Rightarrow}
+%21D4 Left Right Double Arrow
+\newunicodechar{⇔}{\Leftrightarrow}
+%2227 Logical And
+\newunicodechar{∧}{\land}
+%2228 Logical Or
+\newunicodechar{∨}{\lor}
+%2229 Intersection
+\newunicodechar{∩}{\cap}
+%222A Union
+\newunicodechar{∪}{\cup}
+%2260 Not Equal To
+\newunicodechar{≠}{\neq}
+%2264 Less-Than or Equal To
+\newunicodechar{≤}{\leq}
+%2265 Greater-Than or Equal To
+\newunicodechar{≥}{\geq}
+%227B Succeeds
+\newunicodechar{≻}{\succ}
+%2281 Does Not Succeed
+\newunicodechar{⊁}{\nsucc}
+%22EB Does Not Contain As Normal Subgroup
+\newunicodechar{⋫}{\ntriangleright}
+%25A1 White Square
+\newunicodechar{□}{\Box}
+%25B7 White Right-Pointing Triangle
+%TODO test \rhd; \ntrianglerighteq from amssymb?
+\newunicodechar{▷}{\triangleright}
+%27E6 Mathematical Left White Square Bracket – there’s also \llbracket from stmaryrd
+\newunicodechar{⟦}{\text{\textlbrackdbl}}
+%27E7 Mathematical Right White Square Bracket – there’s also \rrbracket from stmaryrd
+\newunicodechar{⟧}{\text{\textrbrackdbl}}
+%27FC Long Rightwards Arrow from Bar
+\newunicodechar{⟼}{\longmapsto}
+%2AB0 Succeeds Above Single-Line Equals Sign
+\newunicodechar{⪰}{\succeq}
+%301A Left White Square Bracket
+\newunicodechar{〚}{\textlbrackdbl}
+%301B Right White Square Bracket
+\newunicodechar{〛}{\textrbrackdbl}
+%→ is defined by default as \textrightarrow, which is invalid in math mode. Same thing for the three other commands. I redefine those four using \DeclareUnicodeCharacter instead of \newunicodechar because the latter warns about the previous definition.
+%→ Rightwards Arrow
+\DeclareUnicodeCharacter{2192}{\ifmmode\rightarrow\else\textrightarrow\fi}
+%¬ Not Sign
+\DeclareUnicodeCharacter{00AC}{\ifmmode\lnot\else\textlnot\fi}
+%… Horizontal Ellipsis
+\DeclareUnicodeCharacter{2026}{\ifmmode\dots\else\textellipsis\fi}
+%× Multiplication Sign
+\DeclareUnicodeCharacter{00D7}{\ifmmode\times\else\texttimes\fi}
+
