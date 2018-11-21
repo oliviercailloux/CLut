@@ -1,0 +1,8 @@
+= Deliberated judgment
+
+A draft paper that introduces the concept of Argumentative Recommenders.
+
+Short version published at https://da2pl.cs.put.poznan.pl/programme/detailed-programme[DA2PL 2018].
+
+See the https://github.com/oliviercailloux/CLut/raw/master/Pres/clut.pdf[Presentation].
+
