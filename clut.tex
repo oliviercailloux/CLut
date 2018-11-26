@@ -173,9 +173,11 @@ We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
 \end{equation}
 
 \subsection{With artificial data}
-Let us consider that users share a personally-scaled and noisy version of an additive utility representation. Define the domain of each criterion as $[0, 1]$, and the partial value function $v_c$ on criterion $c$ as a piecewise linear value function with discontinuity points at $x_1$ and $x_2$. User $i$ has discontinuity points $x_1+\alpha_{i, c}, x_2+\beta_{i, c}$ with $\alpha_{i, c}, \beta_{i, c}$ taken from some probability distribution. User $i$ has value function $v_i = \sum_{c \in \allcrits} w_i v_i^c$.
+Let us consider that users share a personally-scaled and noisy version of an additive utility representation. Define the domain of each criterion as $[0, 1]$, and the partial value function $v^c$ on criterion $c$ as a piecewise linear value function with discontinuity points at $x^1_c$ and $x^ 2_c$. User $i$ has discontinuity points $x^1_c + \alpha_{i, c}, x^2_c + \beta_{i, c}$ with $\alpha_{i, c}, \beta_{i, c}$ taken from some probability distribution. User $i$ has value function $v_i = \sum_{c \in \allcrits} w_i v_i^c$, representing her deliberated preference.
 Furthermore, the user reports a preference that is a noisy version of her deliberated preference, up to some random error parameter.
 We generate datasets using those artificial value functions, and we check to which extend we can predict her deliberated preference.
+
+We generate items evaluated on the criteria $\allcrits$.
 
 \subsection{Data set: Sushi}
 We experiment using the Sushi data set (ref…)
