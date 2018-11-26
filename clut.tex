@@ -112,7 +112,7 @@ Finally, assume the intuitive behavior of the user is a noisy version of her \ac
 Then, our task becomes close to one of classical collaborative learning, as \ac{MAVT} defines the class of functions among which to select an optimal one during learning. Future work will attempt to draw on this approach to effectively propose an \ac{MAVT}-based \ac{AR}.
 
 The principles on which \ac{MAVT} rests are applicable in specific contexts: those in which the items (among which the user aims to choose) can be exhaustively described by a set of objective descriptors of the items, known a priori, and which each evaluate the desirability of the items on some aspect. Such aspects are called criteria. Exhaustively described means that the user considers nothing else than the performance of the items on the criteria as relevant for the recommendation.
-Thus, consider a set of criteria $\crits$ is known, together with corresponding scales $X_c, c \in \crits$, and descriptors $b_c: \allitems → X_c, c \in \crits$, that each describe the items on a specific criterion $c$.
+Thus, consider a set of criteria $\allcrits$ is known, together with corresponding scales $X_c, c \in \allcrits$, and descriptors $b_c: \allitems → X_c, c \in \allcrits$, that each describe the items on a specific criterion $c$.
 
 In such a context, an \ac{MAVT} model representing $\succeq$ is a set of functions $v_c: X_c → \R$ (one for each criterion) such that $\itm \succeq \itm'$ iff $\sum_{c \in C} v_c(b_c(\itm)) ≥ \sum_{c \in C} v_c(b_c(\itm'))$.
 
@@ -148,6 +148,10 @@ We want to find $\{w_i^c, i \in I, c \in \mathcal{C}\}, \{\alpha^c, c \in \mathc
 \end{equation}
 We force $w$ positive. And $\alpha$ is forced positive to respect the preference direction: we assume the data is encoded so that higher $b_j^c$ means preferred performance. Where $b_j^c$ is the performance of item $b_j$ on criterion $c$.
 
+We considered the ratings over $J_i, i \in I$, and $\allcrits = \{“style”, “major group”, “heaviness”, “frequency”, “price”, “popularity”\}$, $\card{\allcrits} = 6$. We obtain an RMSE of about 1.3. With Jill-Jen’s bilinear model (with biases), we obtained 1.2106. With only bias for user and bias for item, we obtain 1.1670. The RMSE of a constant model (that always predicts the observed average) is 1.2729. With SVD++ (bilinear and bias, rank=3): 1.1685.
+
+See \url{https://github.com/caserec/Datasets-for-Recommneder-Systems}.
+
 \subsection{Predict ratings}
 We could want to check whether we are able to predict the right ratings. In that case, we would assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
 
@@ -165,6 +169,11 @@ We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
 \begin{equation}
 \min_{U, V, W_A, W_B} \sum_{i \in i} L(≥_i, \set{(v_j, v_{j'}) \suchthat u_i^T v_j ≥ u_i^T v_{j'}}) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
 \end{equation}
+
+\subsection{With artificial data}
+Let us consider that users share a personally-scaled and noisy version of an additive utility representation. Define the domain of each criterion as $[0, 1]$, and the partial value function $v_c$ on criterion $c$ as a piecewise linear value function with discontinuity points at $x_1$ and $x_2$. User $i$ has discontinuity points $x_1+\alpha_{i, c}, x_2+\beta_{i, c}$ with $\alpha_{i, c}, \beta_{i, c}$ taken from some probability distribution. User $i$ has value function $v_i = \sum_{c \in \allcrits} w_i v_i^c$.
+Furthermore, the user reports a preference that is a noisy version of her deliberated preference, up to some random error parameter.
+We generate datasets using those artificial value functions, and we check to which extend we can predict her deliberated preference.
 
 \subsection{Data set: Sushi}
 We experiment using the Sushi data set (ref…)
@@ -185,30 +194,30 @@ We summarize the preference of $i$ as follows. The ratings over $J_i$ are transf
 
 \appendix
 \section{Sufficient conditions for an MAVT representation}
-Condition 1: the descriptors $\{b_c, c \in \crits\}$ are such that whether $\itm \succeq \itm'$ depend only on the descriptions on the items according to $\set{b_c, c \in \crits}$.
+Condition 1: the descriptors $\{b_c, c \in \allcrits\}$ are such that whether $\itm \succeq \itm'$ depend only on the descriptions on the items according to $\set{b_c, c \in \allcrits}$.
 
-In the sequel we treat $\succeq$ as a relation over $X = \prod_{c \in \crits} X_c$, which we can do thanks to condition 1.
+In the sequel we treat $\succeq$ as a relation over $X = \prod_{c \in \allcrits} X_c$, which we can do thanks to condition 1.
 Define $\sim$ as the symmetric part of $\succeq$ and $\succ$ its asymmetric part.
 Thus, $\sim$ is an equivalence relation.
 
 Our second condition mandates that comparisons between two items that have the same value on some descriptor do not change if that value changes equally for both items (thus, the comparison must be independent of that value provided it is equal on both items). For example, if the user deliberately prefers a flat that is 50 meters square and has a washing machine to a flat that is 60 meters square but has no washing machine, given that both flats are priced 500 € (and assuming only these three criteria matter), then the user has the same deliberated preference ordering for two flats that have the same characteristics except that they are both priced 800 €.
 
-With $C = \crits \setminus \{c\}$ for some $c \in \crits$, thus $C$ contains all criteria but one, let $X_C = \prod_{d \in C} X_d$, and let $(x_C, w_c) \in X$ represent the performance of an item $\itm \in \allitems$ where $x_C \in X_C$ describes the item $\itm$ on the criteria $C$ and $w_c \in X_c$ is the remaining description. %Similar notation is used when $C$ contain all criteria but two.
+With $C = \allcrits \setminus \{c\}$ for some $c \in \allcrits$, thus $C$ contains all criteria but one, let $X_C = \prod_{d \in C} X_d$, and let $(x_C, w_c) \in X$ represent the performance of an item $\itm \in \allitems$ where $x_C \in X_C$ describes the item $\itm$ on the criteria $C$ and $w_c \in X_c$ is the remaining description. %Similar notation is used when $C$ contain all criteria but two.
 
-Condition 2: $\forall C = \crits \setminus \{c\}, w_c, z_c \in X_{c}, x_C, y_C \in X_C: (x_C, w_c) \succ (y_C, w_c) ⇒ (x_C, z_c) \succ (y_C, z_c)$.
+Condition 2: $\forall C = \allcrits \setminus \{c\}, w_c, z_c \in X_{c}, x_C, y_C \in X_C: (x_C, w_c) \succ (y_C, w_c) ⇒ (x_C, z_c) \succ (y_C, z_c)$.
 
-Our last two conditions are more technical. First, the set of possible items must be rich enough. We say that a criterion $c$ is solvable iff, with $C = \crits \setminus \{c\}$, for all $x \in \allitems$ and $y_C \in X_C$, there exists $z_c \in X_c$ such that $x \sim (y_C, z_c)$.
+Our last two conditions are more technical. First, the set of possible items must be rich enough. We say that a criterion $c$ is solvable iff, with $C = \allcrits \setminus \{c\}$, for all $x \in \allitems$ and $y_C \in X_C$, there exists $z_c \in X_c$ such that $x \sim (y_C, z_c)$.
 
 Condition 3: there are at least three solvable criteria.
 
 In the example of a choice of a flat, three solvable criteria might be the size of the flat in meter squares, its price, and its distance to the city center. The presence of a washing machine is a non solvable criterion.
 
-The second technical and last condition is an archimedian requirement. In loose terms, we want to forbid that some item be infinitely far away, in the sense that the item would be preferred to an infinite sequence of equally spaced items. Given a criterion $c$, with $C = \crits \setminus \{c\}$, given $y_C, z_C \in X_C$, we say that $y_C$ and $z_C$ are not indifferent iff there exists some $x_c \in X_c$ such that not $(x_c, y_C) \sim (x_c, z_C)$ (note that by Condition 2, this “exists” is equivalent to a “for all”). Given $c \in \crits, C = \crits \setminus \{c\}$, we say that an infinite sequence of values in $X_c$ is equally spaced iff there exists $y_C, z_C \in X_C$ not indifferent such that for any two consecutive elements $x_c, x'_c$ in the sequence, $(x_c, y_C) \sim (x'_c, z_C)$. Furthermore, such a sequence is bounded iff there exists an item that is strictly deliberately preferred to $(x_c, y_C)$ for every $x_c$ in the sequence.
+The second technical and last condition is an archimedian requirement. In loose terms, we want to forbid that some item be infinitely far away, in the sense that the item would be preferred to an infinite sequence of equally spaced items. Given a criterion $c$, with $C = \allcrits \setminus \{c\}$, given $y_C, z_C \in X_C$, we say that $y_C$ and $z_C$ are not indifferent iff there exists some $x_c \in X_c$ such that not $(x_c, y_C) \sim (x_c, z_C)$ (note that by Condition 2, this “exists” is equivalent to a “for all”). Given $c \in \allcrits, C = \allcrits \setminus \{c\}$, we say that an infinite sequence of values in $X_c$ is equally spaced iff there exists $y_C, z_C \in X_C$ not indifferent such that for any two consecutive elements $x_c, x'_c$ in the sequence, $(x_c, y_C) \sim (x'_c, z_C)$. Furthermore, such a sequence is bounded iff there exists an item that is strictly deliberately preferred to $(x_c, y_C)$ for every $x_c$ in the sequence.
 
 Condition 4: There exists a solvable criterion $c$ such that there is no infinite sequence of values in $X_c$ that is equally spaced and bounded.
 
 \begin{thm}
-	Given a set of items $\allitems$, a set of criteria $\crits$, scales $X_c$ and descriptors $b_c: \allitems → X_c, c \in \crits$, and $\succeq$ a binary relation over $\allitems$, if the four conditions above are satisfied, then an \ac{MAVT} model representing $\succeq$ exists.
+	Given a set of items $\allitems$, a set of criteria $\allcrits$, scales $X_c$ and descriptors $b_c: \allitems → X_c, c \in \allcrits$, and $\succeq$ a binary relation over $\allitems$, if the four conditions above are satisfied, then an \ac{MAVT} model representing $\succeq$ exists.
 \end{thm}
 
 \section{Double-strategy}
