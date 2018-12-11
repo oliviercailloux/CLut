@@ -61,10 +61,10 @@ This section describes the new understanding of preference I propose, called the
 
 I consider given a set of items $\allitems$ among which a user $\usr$ wants to choose. I also consider given a set $\allargs$ containing arguments that may possibly help $\usr$ form a deliberated opinon about which item is best for her. Elements of $\allargs$ are not detailed and can be conceived as strings in a natural language. An example of an argument is $\ar = $ “Item $\itm$ is better than item $\itm'$ because $\itm$ has a good performance on criteria ‘price’ and ‘speed’ while item $\itm'$ has a good performance only on criterion ‘aspect’, which you do not consider important”.
 
-The \ac{DP} of $\usr$ is defined as the subset of items that are considered by $\usr$ as having no item strictly preferred to them, considering all arguments in $\allargs$. To define this properly, I assume we can observe the reaction of $\usr$ to arguments, as follows. 
+The \ac{DP} of $\usr$ is defined as the subset of items that are considered by $\usr$ as having no item strictly preferred to them, considering all arguments in $\allargs$. To define this properly, we assume we can observe the reaction of $\usr$ to arguments, as follows. 
 
 Define $\ibeats$ as a binary relation over $\allitems × \allargs$, representing the results of the following experiments. Present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and let her decide, considering the arguments $\ar$ and $\ar'$, which item among $\itm$ and $\itm'$ she prefers, if any. 
-Define $(\itm, \ar) \ibeats (\itm', \ar')$ iff $\usr$ strictly prefers $\itm$ to $\itm'$, given $\ar$ and $\ar'$. Note that if no strict preference holds, $\ibeats$ does not relate these two pairs (thus $(\itm, \ar) \nibeats (\itm', \ar')$ and $(\itm', \ar') \nibeats (\itm, \ar)$). 
+Define $(\itm, \ar) \ibeats (\itm', \ar')$ iff $\usr$ strictly prefers $\itm$ to $\itm'$, given $\ar$ and $\ar'$. Note that if no strict preference holds, $\ibeats$ does not relate these two pairs (thus $(\itm, \ar) \nibeats (\itm', \ar')$ and $(\itm', \ar') \nibeats (\itm, \ar)$). If the answer of the individual changes when asked several times the same question, we consider that no strict preference holds, as we are interested in the stable part of the individual’s judgement.
 The relation $\ibeats$ plays here the role of the basic observable \citeauthor{von_neumann_theory_1944} talk about (see \cref{sec:motiv}).
 
 The \ac{DP} $\uitems \subseteq \allitems$ of $\usr$ in that situation contains an item $\itm$ iff $\forall (\itm', \ar') \in \allitems × \allargs, \exists \ar \in \allargs \suchthat (\itm', \ar') \nibeats (\itm, \ar)$.
@@ -133,6 +133,11 @@ Let $X = \prod_{c \in \mathcal{B}}$ denote the cardinal product space where desc
 
 \subsection{Classical collaborative learning}
 In classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
+
+\subsection{Adapting MAVT}
+The ratings we observe are given on an absolute scale: the zero is meaningful, and the unit is fixed. To the contrary, the evaluation given by a classical MAVT model has no zero and no unit: given a value function $v$ representing the user’s preferences, the value function $v' = \alpha + \beta v$ represents it equally well, for any constant $\alpha$ and positive constant $\beta$.
+
+To bridge this discrepancy, we add a fictitious criterion $d$ and extend the set of criteria to $D = C ∪ \{d\}$. The partial value function $v_d$ associated to that criterion is constant, equal to one for its whole domain. The associated weight $w^d_i$ is used to indicate the “bias” of the user $i$.
 
 \subsection{Using given knowledge}
 However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
