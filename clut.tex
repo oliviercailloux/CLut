@@ -155,7 +155,7 @@ We want to find $\{w_i^c, i \in I, c \in \mathcal{C}\}, \{\alpha^c, c \in \mathc
 \end{equation}
 We force $w$ positive. And $\alpha$ is forced positive to respect the preference direction: we assume the data is encoded so that higher $b_j^c$ means preferred performance. Where $b_j^c$ is the performance of item $b_j$ on criterion $c$.
 
-We considered the ratings over $J_i, i \in I$, and $\allcrits = \{“style”, “major group”, “heaviness”, “frequency”, “price”, “popularity”\}$, $\card{\allcrits} = 6$. We obtain an RMSE of about 1.3. With Jill-Jen’s bilinear model (with biases), we obtained 1.2106. With only bias for user and bias for item, we obtain 1.1670. The RMSE of a constant model (that always predicts the observed average) is 1.2729. With SVD++ (bilinear and bias, rank=3): 1.1685.
+We considered the ratings over $J_i, i \in I$, and $\allcrits = \{“style”, “major group”, “heaviness”, “frequency”, “price”, “popularity”\}$, $\card{\allcrits} = 6$. We obtain an RMSE of about 1.3. With Clut plus bias: 1.209. With Jill-Jen’s bilinear model (with biases), we obtained 1.211. The RMSE of a constant model (that always predicts the observed average) is 1.273 (or 1.269). Model “sum-bias” with $n$ + $m$ parameters, only bias for items and users: 1.21 or 1.17. With SVD++ (bilinear and bias, rank=3): 1.169 (this number seems robust). (! these numbers are not necessarily obtained on the same training set, to be re-run.)
 
 See \url{https://github.com/caserec/Datasets-for-Recommneder-Systems}.
 
