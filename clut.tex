@@ -155,7 +155,7 @@ We want to find $\{w_i^c, i \in I, c \in \mathcal{C}\}, \{\alpha^c, c \in \mathc
 \end{equation}
 We force $w$ positive. And $\alpha$ is forced positive to respect the preference direction: we assume the data is encoded so that higher $b_j^c$ means preferred performance. Where $b_j^c$ is the performance of item $b_j$ on criterion $c$.
 
-We considered the ratings over $J_i, i \in I$, and $\allcrits = \{“style”, “major group”, “heaviness”, “frequency”, “price”, “popularity”\}$, $\card{\allcrits} = 6$. We obtain an RMSE of about 1.3. With Clut plus bias: 1.209. With Jill-Jen’s bilinear model (with biases), we obtained 1.211. The RMSE of a constant model (that always predicts the observed average) is 1.273 (or 1.269). Model “sum-bias” with $n$ + $m$ parameters, only bias for items and users: 1.21 or 1.17. With SVD++ (bilinear and bias, rank=3): 1.169 (this number seems robust). (! these numbers are not necessarily obtained on the same training set, to be re-run.)
+We considered the ratings over $J_i, i \in I$, and $\allcrits = \{$“style”, “major group”, “heaviness”, “frequency”, “price”, “popularity”$\}$, $\card{\allcrits} = 6$. We obtain an RMSE of about 1.3. With Clut plus bias: 1.209. With Jill-Jen’s bilinear model (with biases), we obtained 1.211. The RMSE of a constant model (that always predicts the observed average) is 1.273 (or 1.269). Model “sum-bias” with $n$ + $m$ parameters, only bias for items and users: 1.21 or 1.17. With SVD++ (bilinear and bias, rank=3): 1.169 (this number seems robust). (! these numbers are not necessarily obtained on the same training set, to be re-run.)
 
 See \url{https://github.com/caserec/Datasets-for-Recommneder-Systems}.
 
@@ -178,7 +178,18 @@ We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
 \end{equation}
 
 \subsection{With artificial data}
-Let us consider that users share a personally-scaled and noisy version of an additive utility representation. Define the domain of each criterion as $[0, 1]$, and the partial value function $v^c$ on criterion $c$ as a piecewise linear value function with discontinuity points at $x^1_c$ and $x^ 2_c$. User $i$ has discontinuity points $x^1_c + \alpha_{i, c}, x^2_c + \beta_{i, c}$ with $\alpha_{i, c}, \beta_{i, c}$ taken from some probability distribution. User $i$ has value function $v_i = \sum_{c \in \allcrits} w_i v_i^c$, representing her deliberated preference.
+Let us consider that users share a personally-scaled and noisy version of an additive value representation. 
+Let $l(x^1, x^2)$, with $x^1, x^2 \in [0, 1], x^1 < x^2$, denote the piecewise linear partial value function $f: [0, 1] → [0, 1]$, with discontinuity points at $x^1$ and $x^2$ and $f(0) = 0$, $f(x^1) = 1/3$, $f(x^2) = 2/3$, $f(1) = 1$.
+
+We define partial value functions for each user and criteria so that the average $v^c$ (over all users) is $l(x^{c, 1}, x^{c, 2})$, with $x^{c, 1}$ drawn from a $t(0, 1/2)$ distribution, where $t(a, b)$ denotes the symmetric triangular distribution with extreme points $a$ and $b$, and $x^{c, 2}$ drawn from a $t(1/2, 1)$ distribution.
+For each user $i$ and criterion $c$, we draw the perturbation parameters $\alpha^{c, 1}_i$ from $t(-0.5 x^{c, 1}, 1/2 x^{c, 1})$ and $\alpha^{c, 2}_i$ from $t(-0.5 (1-x^{c, 2}), 1/2 (1-x^{c, 2}))$, and define $v^c_i = l(x^{c, 1}+\alpha^{c, 1}_i, x^{c, 2} + \alpha^{c, 2}_i)$.
+
+We draw the weights of the user $i$ (for each $i$) by drawing $\omega^c_i$, for each criterion, from $tN(1/2, 0.1)$, where $tN$ denotes a normal distribution truncated at zero and one. Then we define $w_i$ as the normalization of $\omega_i$ (so that $\sum_c w_i^c = 1$).
+
+These parameters define together the value functions of each individual: given an item $j$, $v_i(j) = \sum_c w^c_i v_i^c(b^c_j)$. This number is between $0$ and $1$, with $1$ representing an ideal item. Furthermore, for each invocation of $v_i$, we draw an error term $\epsilon$ from $N(0, 0.1)$, representing the noise, where $N$ denotes a normal distribution, and use effectively $v'_i = v_i + \epsilon$.
+
+We draw randomly the performances of a set of items $\allitems$. For each $j \in \allitems$ and criterion $c \in \allcrits$, $b_j^c$ is drawn from $tN(0.5, 1)$. Because it is known that users do not tend to use the full range of the scale offered to them when rating items, we assume a non linear relation from $v'_i$ to the rating. We draw, for each user $i$, a number $z_i$ from a $N(0.25, 0.1)$ distribution truncated at zero, and define a piecewise linear function $\rho_i: [0, 1] → [0, 6]$ with one discontinuity point, such that $\rho_i(0) = 0$, $\rho_i(z_i) = 3$, $\rho_i(1) = 6$. Given an item $j$, the user assigns the appreciation $r_{ij} = \floor{\rho_i(v_i(j))}$.
+
 Furthermore, the user reports a preference that is a noisy version of her deliberated preference, up to some random error parameter.
 We generate datasets using those artificial value functions, and we check to which extend we can predict her deliberated preference.
 
