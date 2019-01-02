@@ -1,18 +1,18 @@
 \RequirePackage[l2tabu, orthodox]{nag}
-\documentclass[french, english]{da2pl2018}
+\documentclass[version=3.21, pagesize, twoside=off, bibliography=totoc, DIV=calc, fontsize=12pt, a4paper, french, english]{scrartcl}
 \pdfoutput=1
 \input{preamble/packages}
 \input{preamble/math_basics}
 \input{preamble/math_mine}
 \input{preamble/redac}
-\input{preamble/draw}
-\input{preamble/acronyms}
+%\input{preamble/draw}
+%\input{preamble/acronyms}
 
 %\setbeamertemplate{headline}[singleline]
 
 \begin{document}
 \title{%
-	Collaborative learning of models of deliberated preference%
+	Argumentative recommenders: a new kind of recommendation systems%
 }
 \author{Olivier Cailloux}
 \author{Florian Yger}
@@ -29,29 +29,32 @@
 \maketitle
 
 \abstract{
-Recommender systems aim at recommending some item as most appropriate for the user. This article introduces a new way of measuring appropriateness for the user: an item is among the most appropriate ones if it is among the preferred items of the user when considering all arguments in favor or against all possible items. I describe precisely this goal and describe what a recommender system aiming for that goal could look like, called an \acl{AR}. I also provide a way of measuring whether a recommender system has achieved the goal, which can be used to compare such recommender systems, and briefly outline a way of building such a system.
+Recommender systems aim at recommending some item as most appropriate for the user. This article introduces a new way of measuring appropriateness for the user: an item is among the most appropriate ones if it is among the preferred items of the user when considering all arguments in favor or against all possible items. We describe precisely this goal and describe what a recommender system aiming for that goal could look like, called an \acl{AR}. We also provide a way of testing whether a recommender system has achieved the goal, which can be used to compare such recommender systems, and outline a way of building such a system.
 }
 
 \section{Introduction}
+\label{sec:intro}
 In a situation where a user has to choose an item among a set of possible items, recommender systems aim at recommending some item as most appropriate for the user.
-In the collaborative learning community, this is usually taken to mean: recommend an item among the most preferred for the user. In this article, I want to propose another goal for recommender systems. I keep the global aim of recommending some item as most appropriate for a given user, but I propose a different understanding of appropriateness. The goal I propose is to recommend an item among those that are in the \ac{DP} of the user, and to prove that it does. The \ac{DP} of the user captures what she prefers when considering all arguments in favor or against all possible items. This differs from her intuitive preference in that the latter does not consider arguments. Thus, the goal I propose is appropriate when one is interested to help the user form a deliberated judgment about which item is best, rather than predict which item the user intuitively prefers. Because this will be done using systems that argue, I call the kind of system I define here an \ac{AR}.
+In the collaborative learning community, this is usually taken to mean: recommend an item among the most preferred for the user. In this article, we want to propose another goal for recommender systems. We keep the global aim of recommending some item as most appropriate for a given user, but propose a different understanding of appropriateness. The goal we propose is to recommend an item among those that are in the \ac{DP} of the user, and to prove that it does. The \ac{DP} of the user captures what she prefers when considering all arguments in favor or against all possible items. This differs from her intuitive preference in that the latter does not consider arguments. Thus, the goal we propose is appropriate when one is interested to help the user form a deliberated judgment about which item is best, rather than predict which item the user intuitively prefers. Because this will be done using systems that argue, we call the kind of system we define here an \ac{AR}.
 Further motivations for this new goal are described in \cref{sec:motiv}, and it is precisely defined in \cref{sec:def}.
 
-Together with this new goal, it is necessary to propose a corresponding measure of the performance of the recommender system (done in \cref{sec:pred}). In the classical approach, measuring the performance of the system amounts to compare its claims (the items it proposes as preferred) to reality (the preference of the user). Because the \ac{DP} of the user is not directly observable, this direct check of correspondance becomes non applicable. However, as I will show, the problem of evaluating the quality of an \ac{AR} can be framed as a prediction problem (although involving different objects), thereby recovering the possibility of empirical validation by confrontation between claims of the system and reality.
+Together with this new goal, it is necessary to propose a corresponding measure of the performance of the recommender system (done in \cref{sec:pred}). In the classical approach, measuring the performance of the system amounts to compare its claims (the items it proposes as preferred) to reality (the preference of the user). Because the \ac{DP} of the user is not directly observable, this direct check of correspondance becomes non applicable. However, as will be showed, the problem of evaluating the quality of an \ac{AR} can be framed as a prediction problem (although involving different objects), thereby recovering the possibility of empirical validation by confrontation between claims of the system and reality.
 
-\Cref{sec:litt} relates our proposal to the literature. \Cref{sec:princ} then sketches one possible way of undertaking this task, applicable in specific contexts: recommend on the basis of explicit principles coming from decision theory. 
+\Cref{sec:litt} relates our proposal to the literature. \Cref{sec:princ,sec:tech} then sketch one possible way of undertaking this task, applicable in specific contexts: recommend on the basis of explicit principles coming from decision theory. 
+
+This article is an extended version of \citet{cailloux_learning_2018}.
 
 \section{Motivation}
 \label{sec:motiv}
-This article discusses a notion of preference that possibly changes when confronted to arguments. That is, I assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind when presented with arguments in favor of, or counter-arguments against, various items. 
+This article discusses a notion of preference that possibly changes when confronted to arguments. That is, we assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind when presented with arguments in favor of, or counter-arguments against, various items. 
 
-By contrast, the notion of preference considered by classical recommender systems (usually left implicit) is that the user intuitively knows what he prefers, and that this is the right basis for him to decide. This notion can be related to the conception of preference put forth by \citet[p. 16]{von_neumann_theory_1944} in their seminal work. They write that “It is clear that every measurement – or rather every claim of measurability – must ultimately be based on some immediate sensation (…). In the case of utility the immediate sensation of preference (…) provides this basis.” When applied to collaborative filtering, this view suggests that the user does not need help for comparing pairs of item: the job of the system is merely to relieve the user from having to search through the whole set. 
+By contrast, the notion of preference considered by classical recommender systems (usually left implicit) is that the user intuitively knows what he prefers, and that this is the right basis for him to decide. This notion can be related to the conception of preference put forth by \citet[p. 16]{von_neumann_theory_1944} in their seminal work (cited by \citet{fishburn_retrospective_1989}). They write that “It is clear that every measurement – or rather every claim of measurability – must ultimately be based on some immediate sensation (…). In the case of utility the immediate sensation of preference (…) provides this basis.” When applied to collaborative filtering, this view suggests that the user does not need help for comparing pairs of item: the job of the system is merely to relieve the user from having to search through the whole set. 
 The user, when presented with a pair of items, knows which one he prefers by introspection, possibly after having tried them both. %DEL?
 Similarly, when the user has already provided some comparisons of preference, this is the final word about those pairs.
 
 This notion of preference as “intuitive” preference is not always the best basis to ground recommendation. Indeed, the user might be unwilling to judge what is best for her on the sole basis of her unaided intuition. First, there are cases where the user can’t easily try out the items. An example is a non repeatable choice, such as choosing a university to study in. 
 Second, the best choice might be the result of a complex thought process that should better ensure, as much as possible, that all relevant arguments have been considered, rather than purely rely on intuition.
-Consider the decision of which smartphone, or which computer, or which house, to buy. 
+Consider the decision of which smartphone, or which house, to buy. 
 This is also easily the case when a notion of fairness is involved, for example when determining who will receive a prize, or how to best distribute revenue in a society, or to which cause I should donate money.
 Third, the user might appreciate being pointed to some non-salient feature of the items under comparison; for example, a user might feel an intuitive attraction to the plane alternative when chosing a transportation means for holidays, seeing that the flight time is only one hour compared to three hours by train, but change her mind when being reminded that the total travel time should be taken into account. Finally, an argument coming from psychology is that unaided intuition is known to be sensible, in some contexts, to framing effects that would perhaps not be considered relevant (by the user himself) when considering arguments and counter-arguments \citep{kahneman_thinking_2013}. An example that involves several kinds of the just enumerated concerns is obtaining a decision procedure for credit requests in a bank: the user probably wants to involve fairness considerations in order to avoid (possibly unconscious) appearance of unjust discriminations; and even if only profit considerations are to bear, the user might want the procedure to go beyond reflecting the bare intuition of an expert.
 
@@ -71,52 +74,53 @@ The \ac{DP} $\uitems \subseteq \allitems$ of $\usr$ in that situation contains a
 
 \section{Prediction of deliberated preference}
 \label{sec:pred}
-An \ac{AR} should be able, given a user, to single out some items as being in his \ac{DP}, and some items as being not in his \ac{DP}, and to prove its claims by arguing correspondingly. 
+An \ac{AR} should be able, given a user, to single out some items as being in his \ac{DP}, and some items as being not in his \ac{DP}, and to defend its claims by arguing correspondingly. 
 Formally, an \ac{AR} $\eta$ has a \emph{scope} $\allusers$, representing a set of users it claims to be able to predict the \ac{DP} of, and gives, for a user $\usr \in \allusers$, a tuple $(\mitems, \mdef, R_\eta, \matt)$, where $\mitems \subseteq \allitems$ is a set of items that $\eta$ claims are among the \ac{DP} of $\usr$, $\mdef: \mitems × \allitems → \allargs$ is an argumentation strategy used to defend items in $\mitems$, $R_\eta \subseteq \allitems × \allitems$ is a binary relation that contains pairs of items $(\itm, \itm')$ such that $\eta$ claims that $\usr$ deliberately prefers $\itm$ to $\itm'$, and $\matt: R_\eta → \allargs$ is an argumentation strategy used to support the claims represented by $R_\eta$. (Elements of this tuple depend on $i$, though this is omitted from the notation.)
 
 An \ac{AR} is valid if its functions $\mdef$ and $\matt$ indeed justify its claims. Informally, it is required of $\mdef$ that, when given an item $\itm'$ and given an item $\itm \in \mitems$ considered by $\eta$ as being in the \ac{DP} of $i$, $\mdef$ produces an argument that successfully defends $\itm$, whatever the argument given in favor of $\itm'$. More precisely and completely, an \ac{AR} $\eta$ is said to be \emph{correct} about a user $\usr$ iff $\forall \itm \in \mitems, \itm' \in \allitems, \ar' \in \allargs: (\itm', \ar') \nibeats (\itm, \mdef(\itm, \itm'))$ and $\forall (\itm, \itm') \in R_\eta, \ar' \in \allargs: (\itm, \matt(\itm, \itm')) \ibeats (\itm', \ar')$. An \ac{AR} is \emph{valid} iff it is correct about all users in its scope.
 
 Importantly, validity implies the correctness of the claims concerning the \ac{DP} of $\usr$. This fact is stated formally below, with $\mnitems = R_\eta(\allitems) = \set{\itm' \in \allitems \suchthat (\itm, \itm') \in R_\eta \text{ for some } \itm \in \allitems}$. (The proof is omitted.)
-\begin{fact}
+\begin{theorem}
 	If an \ac{AR} $\eta$ is valid, then $\forall \usr \in \allusers: \mitems \subseteq \uitems \text{ and } \mnitems \subseteq \allitems \setminus \uitems$.
-\end{fact}
+\end{theorem}
 
-This notion of validity can be used to \emph{compare} \acp{AR}, in the following way. Consider two \acp{AR} $\eta$ and $\eta'$ dealing with the same set of items $\allitems$ and having overlapping scopes (so that the intersection of the users in their scopes is not null). Such \acp{AR} could for example have been built by different research teams studing the same recommendation setting. Considering a user $\usr$ in both their scopes, obtain two tuples, $(\mitems, \mdef, R_\eta, \matt)$ and $(\mitems[\eta'], \mdef[\eta'], R_{\eta'}, \matt[\eta'])$. Assume they strongly disagree on the prediction of the \ac{DP} of $\usr$, meaning that for some item $\itm \in \allitems$, the first system claims that $\itm$ is in the \ac{DP} of $\usr$, thus $\itm \in \mitems$, and the second system claims it is not, thus $\exists \itm' \suchthat (\itm', \itm) \in R_{\eta'}$. Suffices now to let the two systems play against each other and use $\usr$ as a judge. That is, we obtain an argument from the first system in defense of its claim, $\ar = \mdef(\itm, \itm')$, and an argument from the second system, $\ar' = \matt[\eta'](\itm', \itm)$. We present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and accordingly obtain $(\itm', \ar') \ibeats (\itm, \ar)$ or $(\itm', \ar') \nibeats (\itm, \ar)$. In the first case, the first system is invalidated, in the second one, the second system is invalidated.
+This notion of validity cannot be used to definitely prove that a recommender system has correctly captured $i$’s \ac{DP}. But it can be used to \emph{compare} \acp{AR}, in the following way. Consider two \acp{AR} $\eta$ and $\eta'$ dealing with the same set of items $\allitems$ and having overlapping scopes (so that the intersection of the users in their scopes is not null). Such \acp{AR} could for example have been built by different research teams studing the same recommendation setting. Considering a user $\usr$ in both their scopes, obtain two tuples, $(\mitems, \mdef, R_\eta, \matt)$ and $(\mitems[\eta'], \mdef[\eta'], R_{\eta'}, \matt[\eta'])$. Assume they strongly disagree on the prediction of the \ac{DP} of $\usr$, meaning that for some item $\itm \in \allitems$, the first system claims that $\itm$ is in the \ac{DP} of $\usr$, thus $\itm \in \mitems$, and the second system claims it is not, thus $\exists \itm' \suchthat (\itm', \itm) \in R_{\eta'}$. Suffices now to let the two systems play against each other and use $\usr$ as a judge. That is, we obtain an argument from the first system in defense of its claim, $\ar = \mdef(\itm, \itm')$, and an argument from the second system, $\ar' = \matt[\eta'](\itm', \itm)$. We present $(\itm, \ar)$ and $(\itm', \ar')$ to $\usr$ and accordingly obtain $(\itm', \ar') \ibeats (\itm, \ar)$ or $(\itm', \ar') \nibeats (\itm, \ar)$. In the first case, the first system is invalidated, in the second one, the second system is invalidated.
 
 \section{Relation to existing literature}
 \label{sec:litt}
 Approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior \citep{greco_trends_2010, sobrie_learning_2018}. 
-Furthermore, numerous approaches have been proposed for modeling preferences using machine learning methods \citep{furnkranz_preference_2010}. Yet other approaches propose to use argumentation theory to enhance recommender systems \citep{chesnevar_empowering_2009, rago_argumentation-based_2018}. These trends constitute promising areas of investigation for building \acp{AR}. Such articles typically are focused towards producing recommender systems on the basis of some principles chosen by the authors. By comparison, this article proposes a precise definition of a new goal for similar argumentative systems (which may or may not be similar to the goal the authors of the cited articles have in mind), and a way of comparing \acp{AR} experimentally when their predictions disagree.
+Furthermore, numerous approaches have been proposed for modeling preferences using machine learning methods \citep{furnkranz_preference_2010}. 
+Several recent articles in particular use active learning approaches to build a preference model of a user in a recommendation setting \citep{teso_constructive_2016, teso_coactive_2017, dragone_constructive_2018, erculiani_automating_2018, dragone_no_2018}.
+Yet other approaches propose to use argumentation theory to enhance recommender systems \citep{chesnevar_empowering_2009, rago_argumentation-based_2018}. These trends constitute promising areas of investigation for building \acp{AR}. Such articles typically are focused towards producing recommender systems on the basis of some principles chosen by the authors. By comparison, this article proposes a precise definition of a new goal for similar argumentative systems (which may or may not be similar to the goal the authors of the cited articles have in mind), and a way of comparing \acp{AR} experimentally when their predictions disagree.
 
 The idea of using a human as a judge to compare argumentative systems also appears in the paper of \citet{irving_ai_2018}.
 There are also articles that are interested in using collaborative filtering on the basis of implicit feedback \citep{rendle_bpr:_2009, hu_collaborative_2008}, an idea somewhat related to ours in the sense that the observed data is not directly the one the model tries to predict.
-Also somewhat related are articles interested in collecting preference data for improving the learning \citep{sepliarskaia_preference_2018}.
-An important literature analyzes necessary and sufficient conditions for the existence of various decision-theoretic models \citep{krantz_foundations_1971, gonzales_additive_1996, bouyssou_consolidated_2015}.
+Also somewhat related are articles interested in collecting preference data for improving the learning \citep{sepliarskaia_preference_2018}. \citet{chen_attribute-aware_2018} review techniques that make use of supplementary data in collaborative filtering tasks.
+\citet{johnson_logistic_2014} uses logits for matrix factorization. \commentOC{Should we say one word about this?}
+An important literature analyzes necessary and sufficient conditions for the existence of various decision-theoretic models \citep{krantz_foundations_1971, gonzales_additive_1996, bouyssou_consolidated_2015}, this will be important in conjuction with the approach for building \acp{AR} on the basis of such models as exposed in \cref{sec:princ}.
+
 Finally, this proposal is intimately related to the important literature on explainable AI \citep{DBLP:journals/corr/abs-1804-11192}.
-
-\citet{johnson_logistic_2014} also uses logits for matrix factorization. \citet{chen_attribute-aware_2018} review techniques that make use of supplementary data in collaborative filtering tasks.
-
-Todo. Relate to work by Passerini et alia \citep{teso_constructive_2016, teso_coactive_2017, dragone_constructive_2018, erculiani_automating_2018, dragone_no_2018}.
 
 \section{Recommend on the basis of explicit principles}
 \label{sec:princ}
-\Cref{sec:def} described a new kind of recommender system, that consider the recommendation task under a different light, and \cref{sec:pred} described how to evaluate such \acp{AR}. But such \acp{AR} do not exist yet. One way of building such systems consists in adapting existing works (related references are given in \cref{sec:litt}). Another way is to design an \ac{AR} from the ground up specifically for tackling the goal described here. Although it is not the main point of this conceptual article, roughly sketching a possible way of doing this could help make this proposal more concrete. This section first briefly describes such a possible way in the context of collaborative settings, then indicates some conditions on the context that must be fulfilled in order to make the proposed approach applicable.
+\Cref{sec:def} described a new kind of recommender system, that consider the recommendation task under a different light, and \cref{sec:pred} described how to evaluate such \acp{AR}. But such \acp{AR} do not exist yet. One way of building such systems consists in adapting existing works (related references are given in \cref{sec:litt}). Another way is to design an \ac{AR} from the ground up specifically for tackling the goal described here. Although it is not the main point of this conceptual article, roughly sketching a possible way of doing this could help make this proposal more concrete. This section first briefly describes such a possible way in the context of collaborative settings, then indicates some conditions on the context that must be fulfilled in order to make the proposed approach applicable. The next section more concretely sketches a way of learning such a model and of studying its performances with numerical experiments.
 
 Consider a collaborative learning setting, where we have collected ratings from users on items, assumed to represent their intuitive rather than deliberated preference. 
-A simple approach to build a proof-of-concept \ac{AR} in such a context is to represent the \ac{DP} of $\usr$ as a weak order ${\succeq} \subseteq \allitems × \allitems$ corresponding to $R_\eta$ and whose maximal elements correspond to $\mitems$ (though the definition tolerates other possibilities).
-Assume that the \ac{DP} of the user can be represented by a decision-theoretic model: because such models are conceived for grounding decisions in sound principles, they might be adequate to model deliberated preferences. % (as opposed to intuitive ones). %DEL?
-For concreteness, assume it is \ac{MAVT} \citep{keeney_decisions_1993}, a set of principles for choice well-known in decision theory.
+A simple approach to build a proof-of-concept \ac{AR} in such a context is to represent the \ac{DP} of $\usr$ as a weak order ${\succeq} \subseteq \allitems × \allitems$, and to consider this weak order as representable by a decision theoretic model.
+
+The weak order ${\succeq}$ corresponds to $R_\eta$ and its maximal elements correspond to $\mitems$ (though the definition tolerates other possibilities). Decision theory has proposed models to represent preferences of decision makers. Even though decision theory does not explicitly use the concept of deliberated preferences as defined here, because its models are conceived for grounding decisions in sound principles, they might be adequate to model deliberated preferences. 
+The model adopted for this article is \ac{MAVT} \citep{keeney_decisions_1993}, a set of principles for choice well-known in decision theory.
 
 Existing works \citep{carenini_generating_2006, labreuche_general_2011} describe how to generate arguments in natural language that explain, on the basis of an \ac{MAVT} model, why an alternative is preferred to another one. This provides a starting point for the step of generating arguments.
 More generally, by picking functions supported by well-studied decision principles, it is made possible to build arguments on the basis of those same principles, and it might be considered that such arguments will have a fighting chance against counter-arguments.
 
-Finally, assume the intuitive behavior of the user is a noisy version of her \ac{DP}. (More elaborated developments would incorporate knowledge from experimental psychology about differences between the usual behavior of users and the one dictated by decision-theoretic models \citep{kahneman_thinking_2013}.)
-Then, our task becomes close to one of classical collaborative learning, as \ac{MAVT} defines the class of functions among which to select an optimal one during learning. Future work will attempt to draw on this approach to effectively propose an \ac{MAVT}-based \ac{AR}.
+Finally, assume the intuitive behavior of the user is a noisy version of her \ac{DP}. (More elaborated developments could incorporate knowledge from experimental psychology about differences between the usual behavior of users and the one dictated by decision-theoretic models \citep{kahneman_thinking_2013}.)
+Then, our task becomes close to one of classical collaborative learning, as \ac{MAVT} defines the class of functions among which to select an optimal one during learning. The next section draws on this approach to effectively propose an \ac{MAVT}-based \ac{AR}.
 
 The principles on which \ac{MAVT} rests are applicable in specific contexts: those in which the items (among which the user aims to choose) can be exhaustively described by a set of objective descriptors of the items, known a priori, and which each evaluate the desirability of the items on some aspect. Such aspects are called criteria. Exhaustively described means that the user considers nothing else than the performance of the items on the criteria as relevant for the recommendation.
-Thus, consider a set of criteria $\allcrits$ is known, together with corresponding scales $X_c, c \in \allcrits$, and descriptors $b_c: \allitems → X_c, c \in \allcrits$, that each describe the items on a specific criterion $c$.
+Thus, consider a set of criteria $\allcrits$ is known, together with corresponding scales $X^c, c \in \allcrits$, and descriptors $b^c: \allitems → X^c, c \in \allcrits$, that each describe the items on a specific criterion $c$. Here we use superscripts for criteria indices because we will need subscripts for user indices; these superscripts do not represent exponentiation.
 
-In such a context, an \ac{MAVT} model representing $\succeq$ is a set of functions $v_c: X_c → \R$ (one for each criterion) such that $\itm \succeq \itm'$ iff $\sum_{c \in C} v_c(b_c(\itm)) ≥ \sum_{c \in C} v_c(b_c(\itm'))$.
+In such a context, an \ac{MAVT} model representing $\succeq$ is a set of functions $v^c: X^c → \R$ (one for each criterion) such that $\itm \succeq \itm'$ iff $\sum_{c \in C} v^c(b^c(\itm)) ≥ \sum_{c \in C} v^c(b^c(\itm'))$.
 
 Consider as an example the choice of an apartment to rent for holidays. The set of criteria might be: surface of the living room, number of beds, distance to city center, modernity of equipment, presence of a washing machine, price. 
 %A minimal condition for these criteria to be appropriate for building an \ac{MAVT} model for a user $\usr$ is that, when two apartments are equally valued on all these criteria (have the same surface of the living room, the same number of beds, and so on), they are equally recommendable. Thus, the set of criteria must completely describe the desirability of an apartment.
@@ -125,39 +129,115 @@ Other examples where building an \ac{AR} on the basis of an \ac{MAVT} model may 
 By contrast, a recommendation task is not suitable for the approach proposed in this section if no set of criteria is known that fully describe the desirability of an item. For example, a choice of movie to watch this evening. %Note that a movie is certainly describable on some set of descriptors (for example, the singleton set including its serial number, or a set including its title, release date, and other attributes that together uniquely identify a movie), but those are not criteria as defined above, as those descriptors do not each evaluate the desirability of a movie on some aspect.
 
 \section{Estimating an MAVT model}
-Assume we have a set of users $I$ of size $m \in \N$, a set of items $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\intvl{1, 5}$ (throughout the article, this notation designates intervals in the integers). 
-We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$: user $i$ is described by $a_i \in A$. 
-The items are described by a set of descriptors whose indices are in $\mathcal{C} = [[1, …, c, …, d]]$. The descriptor $B_c: J → X_c, B_c \in \mathcal{B}$ evaluates each item according to a scale $X_c$. 
-%We also write $B_{cj}$ for $B_c(j)$, viewing the description information as encoded in a matrix $B$. 
-Let $X = \prod_{c \in \mathcal{B}}$ denote the cardinal product space where descriptions of items lie, and let $b_j \in X$ denote the description of an item $j$.
+\label{sec:tech}
+We are finally left with the concrete task of learning MAVT models that represent the users’ \acp{DP} in a collaborative learning setting.
 
-\subsection{Classical collaborative learning}
-In classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
+Assume we have a set of users $I$ of size $m \in \N$, a set of items $J$ of size $n \in \N$, a set of observed pairs $O \subseteq I × J$ and a relation $r$ mapping those observed pairs $(i, j) \in O$ to some rating $r_{ij}$, an integer in $\intvl{1, 5}$ (this notation designates intervals in the integers). 
+We also assume known the set of criteria $\allcrits$ of interest to the user (see \cref{sec:princ}). Each criterion $c \in \allcrits$ is associated to a (known) descriptor $b^c: J → [0, 1]$ which represents the performances of the items on the given criterion. Thus, the scales $X^c$ used for measuring the objective performances of the criteria are here all supposed to be $[0, 1]$, for simplicity.
+%Let $X = \prod_{c \in \allcrits} X_c$ denote the cardinal product where descriptions of items lie, and let $b_j \in X$ denote the performances of an item $j$.
 
-\subsection{Adapting MAVT}
-The ratings we observe are given on an absolute scale: the zero is meaningful, and the unit is fixed. To the contrary, the evaluation given by a classical MAVT model has no zero and no unit: given a value function $v$ representing the user’s preferences, the value function $v' = \alpha + \beta v$ represents it equally well, for any constant $\alpha$ and positive constant $\beta$.
+\subsection{MAVT with logits}
+In order to learn an MAVT model per user, we choose here to learn partial value functions that have the same shape for all users, and let the weights of these partial functions vary individually. This assumes that users appreciate trade-offs within a criterion in a similar way, but are differenciated by the importance they give to different criteria.
+The partial value functions are represented by parameterized logit functions, defined as $\sigma(\alpha, \beta, x) = \frac{1}{1+\alpha e^{-\beta x}}$. Thus, the parameters are $\alpha^c, \beta^c$, for each criterion $c$, used for representing the partial value functions shapes; and $w^c_i$, for each criterion $c$ and user $i$.
 
-To bridge this discrepancy, we add a fictitious criterion $d$ and extend the set of criteria to $D = C ∪ \{d\}$. The partial value function $v_d$ associated to that criterion is constant, equal to one for its whole domain. The associated weight $w^d_i$ is used to indicate the “bias” of the user $i$.
+Let $L$ denote a loss function that compares the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; let $\lambda$ denote a real number used to ponder our two objectives, one aiming for a best fit, another aiming for regularized weights; and let $\norm{.}_2^2$ denote the squared L2 norm \commentOC{Problem below, we should apply the norm to a vector, I suppose}.
 
-\subsection{Using given knowledge}
-However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
-
-We could define $u_i = W_A a_i$ and $v_j = W_B b_j$ and obtain $r_{ij} \approx a_i^T (W_A^T W_B) b_j$, thus we could optimize by searching for the best $(W_A^T W_B)$. But as this could be too constrained, we will also try to relax these constraints and search for a representation that takes into account that $u_i$ should be close to $W_A a_i$, but not necessarily equal.
-
-\subsection{Predict ratings with logits}
-Assume we are given a loss function $L$ that compares the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$.
-
-Define $\sigma(\alpha, \beta, x) = \frac{1}{1+\alpha e^{-\beta x}}$.
-
-We want to find $\{w_i^c, i \in I, c \in \mathcal{C}\}, \{\alpha^c, c \in \mathcal{C}\}, \{\beta^c, c \in \mathcal{C}\}$ that optimize the following objective:
+We want to find $\{w_i^c, i \in I, c \in \allcrits\}, \{\alpha^c, c \in \allcrits\}, \{\beta^c, c \in \allcrits\}$ that optimize the following objective:
 \begin{equation}
-\min_{w, \alpha, \beta} \sum_{(i, j) \in O} L(r_{ij}, \sum_{c \in \mathcal{C}} w_i^c \sigma(\alpha^c, \beta^c, b_j^c)) + \lambda \sum_{i, c} \norm{w_i^c}_2^2.
+\min_{w, \alpha, \beta} \sum_{(i, j) \in O} L(r_{ij}, \sum_{c \in \allcrits} w_i^c \sigma(\alpha^c, \beta^c, b^c(j))) + \lambda \sum_{i \in I, c \in \allcrits} \norm{w_i^c}_2^2.
 \end{equation}
-We force $w$ positive. And $\alpha$ is forced positive to respect the preference direction: we assume the data is encoded so that higher $b_j^c$ means preferred performance. Where $b_j^c$ is the performance of item $b_j$ on criterion $c$.
+We force $w^c_i$ and $\alpha^c$ positive to respect the preference direction: we assume the data is encoded so that higher $b^c(j)$ means preferred performance.
 
+This is now a classical learning task that can be achieved by classical means. \commentOC{Florian: perhaps say (in one sentence?) what we do here, with a reference if appropriate?}
+
+We define the partial value functions $v^c_i$ and aggregated value function $v_i$ representing our estimation of the deliberated preferences of user $i$ as $v_i^c(j) = \sigma(\alpha^c, \beta^c, b^c(j))$ and $v_i(j) = \sum_{c \in \allcrits} w_i^c v_i^c(j)$.
+
+\subsection{Learning an absolutely-scaled version of MAVT}
+The foregoing approach must be slightly adapted before being usable in the context we postulated.
+The ratings $r_{ij} \in \intvl{1, 5}$ that we observe are given on an absolute scale: the lowest point ($1$) is meaningful, and the unit is fixed. On the contrary, the evaluations given by a classical MAVT model have no zero and no unit: given a value function $v$ representing the user’s preferences, the value function $v' = \alpha + \beta v$ represents it equally well, for any constant $\alpha$ and positive constant $\beta$.
+
+To bridge this discrepancy, we add a fictitious criterion $d$ and extend the set of criteria to $D = \allcrits ∪ \{d\}$.  The learned aggregated value function thus becomes $v_i = \sum_{c \in D} w^c_i v^c$.
+The partial value function $v^d$ associated to that added criterion is constant, equal to one for its whole domain. The associated weight $w^d_i$, which is learned together with the other parameters, is used to indicate the “bias” of the user $i$. It is interpreted as the value of the “zero” item: if an item has all zero performances, its rating is $w^d_i$. If an item fares better than the zero item, $v_i$ will increase its rating. A consequence of this choice is that the whole range of the scale is not used, which might correspond to the rating behavior of real users. Furthermore, the learned weights are not normalized, and are designed to be interpreted in an absolute sense: $w_i^c$ represents the number of stars added by the corresponding criterion when the item is perfect on that criterion, from the point of view of user $i$.
+
+Our final learning task becomes:
+\begin{equation}
+\min_{w, \alpha, \beta} \sum_{(i, j) \in O} L(r_{ij}, \sum_{c \in \allcrits} w_i^c \sigma(\alpha^c, \beta^c, b^c(j)) + w_i^d) + \lambda \sum_{i \in I, c \in D} \norm{w_i^c}_2^2.
+\end{equation}
+
+\subsection{Testing with empirical data}
+The obtained model can be tested in two very different ways. One would involve treating it properly as an \ac{AR}, and confronting its propositions to the judgements of real users, by comparing its propositions to the ones of another \ac{AR}, as indicated in \cref{sec:pred}. This is however not yet applicable here, as our model does not produce arguments: we only sketched a first step, aimed at learning \ac{MAVT} models, which should be included in a strategy similar to the one proposed in \cref{sec:princ} to obtain a full-fledged \ac{AR}. 
+
+Another way to test the obtained model, simpler but less satisfactory, is the more familiar comparison of the predictions of the model to a pre-existing database of (intuitive) preference data. Although the goal of an \ac{AR} is not to merely predict intuitive preferences (but rather to predict deliberated preferences), it can still be instructive to see how the obtained \ac{AR} performs with this task.
+However, because the learning goal we propose is new, it is difficult to find suitable empirical datasets to achieve this comparison. Such dataset should include items that can be objectively described on a set of criteria (such as hotels or smartphones), together with their descriptions, as explained in \cref{sec:princ}, and with ratings given by several users, as in a collaborative setting. Such datasets certainly exist within databases of web vendors, or probably could be created by combining several sources of information, but we have not found ready-made publicly available ones. We observe that this is a common problem within recent research involving elaborated preference models, for example, \citet{teso_constructive_2016} also use artificial data to test their proposal.
+
+For illustrative purposes, we describe here the Sushi dataset \citep{kamishima_nantonac_2003}. It is not fully appropriate for our task because it has very few objective descriptors, and because the task of appreciating sushis probably does not mandate much deliberation. But it is formally applicable in our setting as it contains several users evaluating a set of items whose objective description is (unfortunately only partially) known. \commentOCf{Je crois que la description n’apporte rien. On ferait peut-être mieux de citer simplement ce jeu de données, et de s’arrêter là, en attendant d’en faire vraiment quelque chose. Si on la garde, il faut décider si on supprime les descriptions des données qu’on n’utilise pas, tel que $>^\text{top}_i$. En fait, plus j’y pense, et plus je trouve qu’on ferait mieux de le laisser tomber complètement, car il n’est vraiment pas approprié pour nous (on ne sait même pas si la description “frequency”, par exemple, représente vraiment qqch. d’objectif et d’où elle vient). Je propose donc de supprimer ce § et ce qui suit.}
+
+In this dataset, $J$ is a set of $100$ sushi types. The original authors collected the sushi from the menu of 25 restaurants, computed the frequency of each sushi type occurring on a menu, and took the $100$ most frequent. Write $P_J$ the frequency (thus a multiple of $1/25$).
+
+Write $J_\text{top} \subset J$ the $10$ most frequent sushi types.
+
+The set $I$ has cardinal $m = 5000$. The authors drew randomly a set of 10 sushi types among $J$, for each user $i$, according to the distribution $P_J$. Let us denote this by $J_i \subset J$.
+
+The authors obtained, for each user $i$ in $I$, three preferential informations, defined as strict partial orders (transitive, asymmetric binary relations). First, they collected a preference ordering over the sushi types from $J_\text{top}$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering (“top” designates the fact that the ordering is over the 10 most frequent sushi types). Second, they collected a rating, in $\intvl{1, 5}$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user thinks each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
+
+Users are described in a space $A$ comprising the attributes $\{$gender, age category, origin-prefecture, origin-region, origin-east/west (binary), current-region, current-east/west (binary), origin-prefecture$\}$. Items are described in a space $B$ comprising the attributes $\{$group, heaviness/oiliness in taste (in $[0, 4]$), frequency of eating (in $[0, 3]$), normalized price (in $[0, 1]$), $P_J(j)$$\}$.
+
+\subsection{Testing with artificial data}
+The model can be tested with artificial data, in order to see how robust it is facing perturbations in the data we learn from. This section describes how such data could be generated.
+
+Let us consider that users share a personally-scaled and noisy version of an additive value representation. 
+Let $l(x^1, x^2)$, with $x^1, x^2 \in [0, 1], x^1 < x^2$, denote the piecewise linear partial value function $f: [0, 1] → [0, 1]$, with discontinuity points at $x^1$ and $x^2$ and $f(0) = 0$, $f(x^1) = 1/3$, $f(x^2) = 2/3$, $f(1) = 1$.
+
+We define partial value functions for each user and criteria so that the average $v^c$ (over all users) is $l(x^{c, 1}, x^{c, 2})$, with $x^{c, 1}$ drawn from a $t(0, 1/2)$ distribution, where $t(a, b)$ denotes the symmetric triangular distribution with extreme points $a$ and $b$, and $x^{c, 2}$ drawn from a $t(1/2, 1)$ distribution.
+For each user $i$ and criterion $c$, we draw the perturbation parameters $\alpha^{c, 1}_i$ from $t(-0.5 x^{c, 1}, 1/2 x^{c, 1})$ and $\alpha^{c, 2}_i$ from $t(-0.5 (1-x^{c, 2}), 1/2 (1-x^{c, 2}))$, and define $v^c_i = l(x^{c, 1}+\alpha^{c, 1}_i, x^{c, 2} + \alpha^{c, 2}_i)$.
+
+We draw the weights of the user $i$ (for each $i$) by drawing $\omega^c_i$, for each criterion, from $tN(1/2, 0.1)$, where $tN$ denotes a normal distribution truncated at zero and one. Then we define $w_i$ as the normalization of $\omega_i$ (so that $\sum_c w_i^c = 1$).
+
+These parameters define together the value functions of each individual: given an item $j$, $v_i(j) = \sum_c w^c_i v_i^c(b^c_j)$. This number is between $0$ and $1$, with $1$ representing an ideal item. Furthermore, for each invocation of $v_i$, we draw an error term $\epsilon$ from $N(0, 0.1)$, representing the noise, where $N$ denotes a normal distribution, and use effectively $v'_i = v_i + \epsilon$.
+
+We draw randomly the performances of a set of items $\allitems$. For each $j \in \allitems$ and criterion $c \in \allcrits$, $b_j^c$ is drawn from $tN(0.5, 1)$. Because it is known that users do not tend to use the full range of the scale offered to them when rating items, we assume a non linear relation from $v'_i$ to the rating. We draw, for each user $i$, a number $z_i$ from a $N(2, 1)$ distribution truncated at zero, scale $v_i$ with $s_i = 5 - z_i$ so that the best item gets five stars, and define $r_{ij} = [s_i v'_i(j) + z_i]$, where the brackets designate the operation of rounding to the closest integer.
+
+\section{Conclusion}
+The main goal of this article is to propose a new goal for recommendation systems. Such systems argue for their propositions, and are appropriate when the user does not a priori know which item to choose, not just because of the difficulty of exploring the set of items to choose from, but because of the difficulty of forming a coherent preference. Thus, such systems are appropriate when the user desires some help for choosing in a systematic or principled way by taking all relevant arguments into account.
+The article presented the idea generally and abstractly in \cref{sec:intro,sec:motiv,sec:def,sec:pred,sec:litt}. 
+
+A second goal of this article is to sketch a way of building such \acp{AR}. To this aim, the next two sections became progressively more concrete and less general. \Cref{sec:princ} proposed a way of building an \ac{AR} by learning models as proposed in decision theory. The intuition is that, first, such models are particularly appropriate to help a user deliberate; second, such models can be learned reasonably easily using techniques known in machine learning; third, such models can “reasonably easily” be used to generate textual arguments understandable by a decision maker thanks to the already existing works in this direction in artificial intelligence and the axiomatic works in decision theory. \Cref{sec:tech} illustrated the second point by describing a way of learning an \ac{MAVT} model in a collaborative learning setting.
+
+It is important to realize that the general part of this article (\cref{sec:motiv,sec:def,sec:pred}) is not conceptually dependent on its most concrete parts (\cref{sec:princ,sec:tech}). \Acp{AR} could be built on different basis than decision-theoretic models. For example, gathering existing arguments in textual forms on various sources on the web and displaying them as-is to the user, or using natural language processing techniques. Similarly, the concept could be applied to settings different than collaborative learning, or using learning techniques different than the one \cref{sec:tech} investigates.
+
+This article has only began to explore the difficulties that need to be overcome in order to build a complete \ac{AR}, let alone a working ecosystem of \acp{AR}. The concrete approach presented in the later part of this article may be judged naïve, and is incomplete as it does not indicate how to generate arguments from the models learned. Furthermore, methodological issues are to be explored, a work that is also only beginning \citep{cailloux_formal_2018, meinard_justification_2018}: it needs to be guaranteed that \acp{AR} are not used as propagandist devices to convince users to do what the conceiver of a particular \ac{AR} desires; on the contrary, a proper debating environment has to be set up (\cref{sec:pred} describes how to let two \acp{AR} “debate”), where sufficiently diverse sources of opinons produce \acp{AR}, thereby producing the conditions for making reasonably sure that the user’s deliberated judgement has been reached. Only in such conditions will this environment be able to help the user legitimately.
+
+\bibliography{clut,manual}
+\end{document}
+
+\appendix
+\section{Experiments}
 We considered the ratings over $J_i, i \in I$, and $\allcrits = \{$“style”, “major group”, “heaviness”, “frequency”, “price”, “popularity”$\}$, $\card{\allcrits} = 6$. We obtain an RMSE of about 1.3. With Clut plus bias: 1.209. With Jill-Jen’s bilinear model (with biases), we obtained 1.211. The RMSE of a constant model (that always predicts the observed average) is 1.273 (or 1.269). Model “sum-bias” with $n$ + $m$ parameters, only bias for items and users: 1.21 or 1.17. With SVD++ (bilinear and bias, rank=3): 1.169 (this number seems robust). (! these numbers are not necessarily obtained on the same training set, to be re-run.)
 
 See \url{https://github.com/caserec/Datasets-for-Recommneder-Systems}.
+
+\subsection{More complete description of the Sushi dataset}
+In this dataset, $J$ is a set of $100$ sushi types \footnote{$X^*=X_B$ in the original notation.}. The original authors collected the sushi from the menu of 25 restaurants, computed the frequency of each sushi type occurring on a menu, and took the $100$ most frequent. Write $P_J$ the frequency (thus a multiple of $1/25$).
+
+Write $J_\text{top} \subset J$ the $10$ most frequent sushi types \footnote{$X_A$}.
+
+The set $I$ has cardinal $m = 5000$. The authors drew randomly a set of 10 sushi types among $J$, for each user $i$, according to the distribution $P_J$. Let us denote this by $J_i \subset J$ \footnote{$X^B_i$}.
+
+The authors obtained, for each user $i$ in $I$, three preferential informations, defined as strict partial orders (transitive, asymmetric binary relations). First, they collected a preference ordering over the sushi types from $J_\text{top}$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering \footnote{$O^A_i$} (“top” designates the fact that the ordering is over the 10 most frequent sushi types). Second, they collected a rating, in $\intvl{1, 5}$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user thinks each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ \footnote{$O^B_i$} (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
+
+Users are described in a space $A$ comprising the attributes $\{$gender, age category, origin-prefecture, origin-region, origin-east/west (binary), current-region, current-east/west (binary), origin-prefecture$\}$. Items are described in a space $B$ comprising the attributes $\{$group, heaviness/oiliness in taste (in $[0, 4]$), frequency of eating (in $[0, 3]$), normalized price (in $[0, 1]$), $P_J(j)$$\}$.
+
+We summarize the preference of $i$ as follows. The ratings over $J_i$ are transformed to preorders $≥^\text{rating}_i$ that tolerate ex-æquos, in the obvious way (better ratings indicate preference). We then merge, for each user $i$, all preferential information, considering contradictions as indicating indifference, and obtain a preorder $≥_i = [≥^\text{rating}_i ∪ >^\text{top}_i ∪ >^\text{indiv}_i]$, where the brackets designate taking the transitive closure and adding the identity relation (to obtain reflexivity). For example, if $>^\text{top}_i$ represents the ordering $(j_1 > j_2 > j_3)$ and $>^\text{indiv}_i$ represents $(j_6 > j_3 > j_4 > j_2)$ and $≥^\text{rating}_i = \emptyset$, then $≥_i$ considers $j_1$ and $j_6$ as strictly preferred to $j_2$ to $j_4$, $j_2$ to $j_4$ ex-æquos, and $j_1$ incomparable to $j_6$.
+
+\section{Other learning approaches}
+\subsection{Classical collaborative learning}
+In classical collaborative learning, we wish to obtain compressed descriptions of the users and the items, $\{u_i, i \in I\}$ and $\{v_j, j \in J\}$, with all $u_i$ and $v_j$ being vectors of some size $k \in \N$. We write $U$ the matrix of size $(m, k)$ that has all $u_i^T$ as rows, and $V$ the matrix of size $(k, n)$ that has all $v_j$ as columns. The compressed descriptions should be such that $r_{ij} \approx u_i^T v_j$.
+
+\subsection{Using given knowledge}
+We also have descriptions of the users in a vector space $A$ of dimension $d_A \in \N$: user $i$ is described by $a_i \in A$. 
+However, we also wish that our compressed descriptions $u_i$ be in a simple relationship with the provided descriptions $a_i$, thus, we search for $u_i \approx f(a_i)$, and similarly, for $v_j \approx g(b_j)$, with $f$ and $g$ “simple”. More precisely, we search for a matrix $W_A$ of size $(k, d_A)$ such that $W_A a_i \approx u_i$, and $W_B$ of size $(k, d_B)$ such that $W_B b_j \approx v_j$. We call $W_A a_i$ and $W_B b_j$ our explainable representation of the users and the items.
+
+We could define $u_i = W_A a_i$ and $v_j = W_B b_j$ and obtain $r_{ij} \approx a_i^T (W_A^T W_B) b_j$, thus we could optimize by searching for the best $(W_A^T W_B)$. But as this could be too constrained, we will also try to relax these constraints and search for a representation that takes into account that $u_i$ should be close to $W_A a_i$, but not necessarily equal.
 
 \subsection{Predict ratings}
 We could want to check whether we are able to predict the right ratings. In that case, we would assume we are given loss functions $L$, that compare the ratings $r_{ij}$ to our approximations of the ratings, for $(i, j) \in O$; $L_I$, that compare the vectors $u_i$ to our explainable representation of them; and $L_J$, that compare the vectors $v_j$ to our explainable representation of them.
@@ -177,42 +257,6 @@ We want to find matrices $U, V, W_A, W_B$ that optimize the following objective:
 \min_{U, V, W_A, W_B} \sum_{i \in i} L(≥_i, \set{(v_j, v_{j'}) \suchthat u_i^T v_j ≥ u_i^T v_{j'}}) + \sum_{i \in I} L_I(u_i, W_A a_i) + \sum_{j \in J} L_J(v_j, W_B b_j).
 \end{equation}
 
-\subsection{With artificial data}
-Let us consider that users share a personally-scaled and noisy version of an additive value representation. 
-Let $l(x^1, x^2)$, with $x^1, x^2 \in [0, 1], x^1 < x^2$, denote the piecewise linear partial value function $f: [0, 1] → [0, 1]$, with discontinuity points at $x^1$ and $x^2$ and $f(0) = 0$, $f(x^1) = 1/3$, $f(x^2) = 2/3$, $f(1) = 1$.
-
-We define partial value functions for each user and criteria so that the average $v^c$ (over all users) is $l(x^{c, 1}, x^{c, 2})$, with $x^{c, 1}$ drawn from a $t(0, 1/2)$ distribution, where $t(a, b)$ denotes the symmetric triangular distribution with extreme points $a$ and $b$, and $x^{c, 2}$ drawn from a $t(1/2, 1)$ distribution.
-For each user $i$ and criterion $c$, we draw the perturbation parameters $\alpha^{c, 1}_i$ from $t(-0.5 x^{c, 1}, 1/2 x^{c, 1})$ and $\alpha^{c, 2}_i$ from $t(-0.5 (1-x^{c, 2}), 1/2 (1-x^{c, 2}))$, and define $v^c_i = l(x^{c, 1}+\alpha^{c, 1}_i, x^{c, 2} + \alpha^{c, 2}_i)$.
-
-We draw the weights of the user $i$ (for each $i$) by drawing $\omega^c_i$, for each criterion, from $tN(1/2, 0.1)$, where $tN$ denotes a normal distribution truncated at zero and one. Then we define $w_i$ as the normalization of $\omega_i$ (so that $\sum_c w_i^c = 1$).
-
-These parameters define together the value functions of each individual: given an item $j$, $v_i(j) = \sum_c w^c_i v_i^c(b^c_j)$. This number is between $0$ and $1$, with $1$ representing an ideal item. Furthermore, for each invocation of $v_i$, we draw an error term $\epsilon$ from $N(0, 0.1)$, representing the noise, where $N$ denotes a normal distribution, and use effectively $v'_i = v_i + \epsilon$.
-
-We draw randomly the performances of a set of items $\allitems$. For each $j \in \allitems$ and criterion $c \in \allcrits$, $b_j^c$ is drawn from $tN(0.5, 1)$. Because it is known that users do not tend to use the full range of the scale offered to them when rating items, we assume a non linear relation from $v'_i$ to the rating. We draw, for each user $i$, a number $z_i$ from a $N(0.25, 0.1)$ distribution truncated at zero, and define a piecewise linear function $\rho_i: [0, 1] → [0, 6]$ with one discontinuity point, such that $\rho_i(0) = 0$, $\rho_i(z_i) = 3$, $\rho_i(1) = 6$. Given an item $j$, the user assigns the appreciation $r_{ij} = \floor{\rho_i(v_i(j))}$.
-
-Furthermore, the user reports a preference that is a noisy version of her deliberated preference, up to some random error parameter.
-We generate datasets using those artificial value functions, and we check to which extend we can predict her deliberated preference.
-
-We generate items evaluated on the criteria $\allcrits$.
-
-\subsection{Data set: Sushi}
-We experiment using the Sushi data set (ref…)
-
-Here $J$ is a set of $100$ sushi types \footnote{$X^*=X_B$ in the original notation.}. The original authors collected the sushi from the menu of 25 restaurants, computed the frequency of each sushi type occurring on a menu, and took the $100$ most frequent. Write $P_J$ the frequency (thus a multiple of $1/25$).
-
-Write $J_\text{top} \subset J$ the $10$ most frequent sushi types \footnote{$X_A$}.
-
-The set $I$ has cardinal $m = 5000$. The authors drew randomly a set of 10 sushi types among $J$, for each user $i$, according to the distribution $P_J$. Let us denote this by $J_i \subset J$ \footnote{$X^B_i$}.
-
-The authors obtained, for each user $i$ in $I$, three preferential informations, defined as strict partial orders (transitive, asymmetric binary relations). First, they collected a preference ordering over the sushi types from $J_\text{top}$ from most to least preferred, with no tie allowed. Let $>^\text{top}_i$ denote that preference ordering \footnote{$O^A_i$} (“top” designates the fact that the ordering is over the 10 most frequent sushi types). Second, they collected a rating, in $\intvl{1, 5}$, for each sushi type in $J_i$. Define $O$ as the set of pairs $(i, j)$ such that $j \in J_i$, and let $r_{ij}$ denote that rating. Third, after two supplementary questions asking how oily the user think each sushi type is and how frequently they eat them, they collected a preference ordering over $J_i$, that we write $>^\text{indiv}_i$ \footnote{$O^B_i$} (“indiv” designates the fact that this relation orders a set of sushi that has been drawn specifically for that user).
-
-Users are described in a space $A$ comprising the attributes $\{$gender, age category, origin-prefecture, origin-region, origin-east/west (binary), current-region, current-east/west (binary), origin-prefecture$\}$. Items are described in a space $B$ comprising the attributes $\{$group, heaviness/oiliness in taste (in $[0, 4]$), frequency of eating (in $[0, 3]$), normalized price (in $[0, 1]$), $P_J(j)$$\}$.
-
-We summarize the preference of $i$ as follows. The ratings over $J_i$ are transformed to preorders $≥^\text{rating}_i$ that tolerate ex-æquos, in the obvious way (better ratings indicate preference). We then merge, for each user $i$, all preferential information, considering contradictions as indicating indifference, and obtain a preorder $≥_i = [≥^\text{rating}_i ∪ >^\text{top}_i ∪ >^\text{indiv}_i]$, where the brackets designate taking the transitive closure and adding the identity relation (to obtain reflexivity). For example, if $>^\text{top}_i$ represents the ordering $(j_1 > j_2 > j_3)$ and $>^\text{indiv}_i$ represents $(j_6 > j_3 > j_4 > j_2)$ and $≥^\text{rating}_i = \emptyset$, then $≥_i$ considers $j_1$ and $j_6$ as strictly preferred to $j_2$ to $j_4$, $j_2$ to $j_4$ ex-æquos, and $j_1$ incomparable to $j_6$.
-
-\bibliography{clut,manual}
-
-\appendix
 \section{Sufficient conditions for an MAVT representation}
 Condition 1: the descriptors $\{b_c, c \in \allcrits\}$ are such that whether $\itm \succeq \itm'$ depend only on the descriptions on the items according to $\set{b_c, c \in \allcrits}$.
 
@@ -236,9 +280,9 @@ The second technical and last condition is an archimedian requirement. In loose 
 
 Condition 4: There exists a solvable criterion $c$ such that there is no infinite sequence of values in $X_c$ that is equally spaced and bounded.
 
-\begin{thm}
+\begin{theorem}
 	Given a set of items $\allitems$, a set of criteria $\allcrits$, scales $X_c$ and descriptors $b_c: \allitems → X_c, c \in \allcrits$, and $\succeq$ a binary relation over $\allitems$, if the four conditions above are satisfied, then an \ac{MAVT} model representing $\succeq$ exists.
-\end{thm}
+\end{theorem}
 
 \section{Double-strategy}
 In the double-strategy, we use different dimensions: $k = d_{A'} + d_U = d_{B'} + d_V$.
