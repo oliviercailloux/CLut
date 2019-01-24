@@ -95,12 +95,12 @@ Importantly, correctness about $i$’s attitude towards arguments implies the va
 Approaches exist which propose to estimate a decision-theoretic model that best approximates a user’s observed behavior \citep{greco_trends_2010, sobrie_learning_2018}. 
 Furthermore, numerous approaches have been proposed for modeling preferences using machine learning methods \citep{furnkranz_preference_2010}. 
 Several recent articles in particular use active learning approaches to build a preference model of a user in a recommendation setting \citep{teso_constructive_2016, teso_coactive_2017, dragone_constructive_2018, erculiani_automating_2018, dragone_no_2018}.
-Yet other approaches propose to use argumentation theory \citep{besnard_elements_2008} to enhance recommender systems \citep{chesnevar_empowering_2009, rago_argumentation-based_2018}. These trends constitute promising areas of investigation for building \acp{AR}. Such articles typically are focused on producing concrete recommender systems. By comparison, this article is situated on a more methodological level as it proposes a precise definition of a new goal for recommendation systems, and a way of comparing \acp{AR} experimentally when their predictions disagree.
+Yet other approaches propose to use argumentation theory \citep{besnard_elements_2008} to enhance recommender systems \citep{chesnevar_empowering_2009, rago_argumentation-based_2018}. These trends constitute promising areas of investigation for building \acp{AR}. Such articles typically are focused on producing concrete recommender systems. By comparison, this article is situated on a more methodological level as it proposes a precise definition of a new goal for recommendation systems, and a way of comparing \acp{AR} experimentally when their predictions disagree. Similarly, the very thorough review provided by \citet{nunes_systematic_2017} exhibit ten articles that generate explanations using collaborative filtering techniques. None of those are interested in a goal similar to ours or use decision-theoretic preference models as explored here (with the interesting exception that \citet{marx_increasing_2010} use a model that can be considered as a simplified MAVT model, but this model does not intervene in the collaborative filtering part of their hybrid approach).
 
 The idea of using a human as a judge to compare argumentative systems also appears in the paper of \citet{irving_ai_2018}.
 There are also articles that are interested in using collaborative filtering on the basis of implicit feedback \citep{rendle_bpr:_2009, hu_collaborative_2008}, an idea somewhat related to ours in the sense that the observed data is not directly the one the model tries to predict.
 Also somewhat related are articles interested in collecting preference data for improving the learning \citep{sepliarskaia_preference_2018}. \citet{chen_attribute-aware_2018} review techniques that make use of supplementary data in collaborative filtering tasks.
-\citet{johnson_logistic_2014} uses logits for matrix factorization. \commentOC{Should we say one word about this? (TODO Florian)}
+\citet{johnson_logistic_2014} uses logits for matrix factorization. \commentOC{Should we say one word about this? (TODO Florian.) We also have to analyze \citet{zhang_explicit_2014}.}
 An important literature analyzes necessary and sufficient conditions for the existence of various decision-theoretic models \citep{krantz_foundations_1971, gonzales_additive_1996, bouyssou_consolidated_2015}, this will be important in conjuction with the approach for building \acp{AR} on the basis of such models as exposed in \cref{sec:princ}.
 
 %Our proposal may strike some readers as related to the field of formal argumentation theory. However, despite us using indeed concepts from argumentation theory such as attack relations between arguments, our goal is fundamentally different than the ones of this literature, as we define a new kind of recommender systems that would aim at predicting which arguments a user will appreciate in order to help her form a deliberated judgment. We are not aware of articles in that literature that are interested in a similar goal. This issue is further commented in another article \citep{cailloux_formal_2018}.
@@ -132,7 +132,7 @@ Consider as an example the choice of an apartment to rent for holidays. A reason
 %A minimal condition for these criteria to be appropriate for building an \ac{MAVT} model for a user $\usr$ is that, when two apartments are equally valued on all these criteria (have the same surface of the living room, the same number of beds, and so on), they are equally recommendable. Thus, the set of criteria must completely describe the desirability of an apartment.
 Other examples where building an \ac{AR} on the basis of an \ac{MAVT} model may be appropriate include: buying a smartphone, buying a computer, choosing a flight to reach a given place, choosing who to give a “best student” award among a given classroom, locating a new factory, or choosing a university to study at.
 
-By contrast, a recommendation task is not suitable for the approach proposed in this section if no set of criteria is known that fully describe the desirability of an item. This might be the case if the decision problem incorporates a strong aesthetic dimension, for example, a choice of movie to watch. %Note that a movie is certainly describable on some set of descriptors (for example, the singleton set including its serial number, or a set including its title, release date, and other attributes that together uniquely identify a movie), but those are not criteria as defined above, as those descriptors do not each evaluate the desirability of a movie on some aspect.
+By contrast, a recommendation task is not suitable for the approach proposed in this section if no set of criteria is known that fully describe the desirability of an item. This might be the case if the decision problem incorporates a strong aesthetic dimension, for example, a choice of movie to watch. For such applications, our approach might be applicable to a subset of users, but fail for another set of users who pay attention to dimensions not captured by the criteria, as also observed by \citet{marx_increasing_2010}. %Note that a movie is certainly describable on some set of descriptors (for example, the singleton set including its serial number, or a set including its title, release date, and other attributes that together uniquely identify a movie), but those are not criteria as defined above, as those descriptors do not each evaluate the desirability of a movie on some aspect.
 
 \section{Estimating an MAVT model}
 \label{sec:tech}
@@ -211,10 +211,28 @@ although this article contrasts our proposal to a single notion of “intuitive�
 
 Second, it needs to be guaranteed that \acp{AR} are not used as propagandist devices to convince users to do what the conceiver of a particular \ac{AR} desires; on the contrary, a proper debating environment has to be set up (\cref{sec:pred} describes how to let two \acp{AR} “debate”), where sufficiently diverse sources of opinions produce \acp{AR}, thereby fulfilling the conditions for making reasonably sure that the user’s deliberated judgment has been reached. Only in such conditions will this environment be able to help the user legitimately.
 
-\bibliography{clut,manual}
-\end{document}
+{\sloppy
+\bibliography{clut,manual} 
+}
 
 \appendix
+\section{Collaborative filtering with explanations}
+The articles found in \citet{nunes_systematic_2017}’s database are the following (with the id in their database).
+\begin{description}
+	\item[208] \doi{10.1145/358916.358995} \citet{cleger-tamayo_explaining_2012}
+	\item[356] \doi{10.1109/CSE.2009.26} \citet{gedikli_understanding_2011}
+	\item[381] \doi{10.1145/1639714.1639725} \citet{gedikli_how_2014}
+	\item[491] \doi{10.1007/978-3-642-23014-1_17} \citet{gkika_investigating_2014}
+	\item[511] \doi{10.1145/2348283.2348470} \citet{guy_personalized_2009}
+	\item[598] \doi{10.1109/SMAP.2014.37} \citet{herlocker_explaining_2000}
+	\item[1028] \doi{10.1109/TSMCA.2008.2003969} \citet{hu_collaborative_2008}
+	\item[1131] \doi{10.1016/j.ijhcs.2013.12.007} \citet{marx_increasing_2010}
+	\item[377] \doi{10.1145/1516360.1516404} \citet{odonovan_visual_2009}
+	\item[334] \doi{10.1109/ICDM.2008.22} \citet{symeonidis_providing_2008}
+	\item[422] \doi{10.1145/1864708.1864771} \citet{yu_it_2009}
+\end{description}
+\end{document}
+
 \section{Experiments}
 We considered the ratings over $J_i, i \in I$, and $\allcrits = \{$“style”, “major group”, “heaviness”, “frequency”, “price”, “popularity”$\}$, $\card{\allcrits} = 6$. We obtain an RMSE of about 1.3. With Clut plus bias: 1.209. With Jill-Jen’s bilinear model (with biases), we obtained 1.211. The RMSE of a constant model (that always predicts the observed average) is 1.273 (or 1.269). Model “sum-bias” with $n$ + $m$ parameters, only bias for items and users: 1.21 or 1.17. With SVD++ (bilinear and bias, rank=3): 1.169 (this number seems robust). (! these numbers are not necessarily obtained on the same training set, to be re-run.)
 
