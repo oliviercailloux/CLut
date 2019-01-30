@@ -47,8 +47,8 @@ This article is an extended version of \citet{cailloux_learning_2018}.
 
 \section{Motivation}
 \label{sec:motiv}
-This article discusses a notion of preference that possibly changes when confronted to arguments. That is, we assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind \commentYM{Comme il y a une littérateurs sur la performativité des indicateurs, il doit bien y avoir une littérature sur la performativité des systèmes de recommandation, non ?}
-\commentOC{Aggarwal, Ch. 7} 
+This article discusses a notion of preference that possibly changes when confronted to arguments. That is, we assume that the user’s knowledge of which item is best for him is not necessarily fixed a priori, and in particular, that the user may change his mind %\commentYM{Comme il y a une littérateurs sur la performativité des indicateurs, il doit bien y avoir une littérature sur la performativité des systèmes de recommandation, non ?}
+%\commentOC{Aggarwal, Ch. 7} 
 when presented with arguments in favor of, or counter-arguments against, adopting various items.
 
 By contrast, the notion of preference considered by classical recommender systems (usually left implicit) is that the user intuitively knows what he prefers, and that this is the right basis for him to decide. This notion can be related to the conception of preference put forth by \citet[p. 16]{von_neumann_theory_1944} in their seminal work (cited by \citet{fishburn_retrospective_1989}). They write that “It is clear that every measurement – or rather every claim of measurability – must ultimately be based on some immediate sensation (…). In the case of utility the immediate sensation of preference (…) provides this basis.” When applied to collaborative filtering, this view suggests that the user does not need help for comparing pairs of item: the job of the system is merely to relieve the user from having to search through the whole set. 
@@ -100,7 +100,8 @@ Yet other approaches propose to use argumentation theory \citep{besnard_elements
 The idea of using a human as a judge to compare argumentative systems also appears in the paper of \citet{irving_ai_2018}.
 There are also articles that are interested in using collaborative filtering on the basis of implicit feedback \citep{rendle_bpr:_2009, hu_collaborative_2008}, an idea somewhat related to ours in the sense that the observed data is not directly the one the model tries to predict.
 Also somewhat related are articles interested in collecting preference data for improving the learning \citep{sepliarskaia_preference_2018}. \citet{chen_attribute-aware_2018} review techniques that make use of supplementary data in collaborative filtering tasks.
-\citet{johnson_logistic_2014} uses logits for matrix factorization. \commentOC{Should we say one word about this? (TODO Florian.) We also have to analyze \citet{zhang_explicit_2014}.}
+\citet{johnson_logistic_2014} uses logits for matrix factorization for implicit feedback. In this work, the authors model the interaction between a user and an object ($0$ or $1$) as a logit function applied to some latent factors and cannot be directly applied to model a score. \citet{zhang_explicit_2014} uses a factorization model which shares its latent factors for approximating three matrices (namely the ratings matrix and implicit feedbacks as a user-feature matrix and an item-feature matrix). The implict feedback considered in this paper give some information on how relevant is feature respectively to a user and for an item in a rating. Then, when recommending an object to a user, reconstructing the implicit feedback matrices can be seen as an explanation on this recommendation. Note that it can be seen as an explainable version of \commentFY{Factorization machine Rendle 2010}
+
 An important literature analyzes necessary and sufficient conditions for the existence of various decision-theoretic models \citep{krantz_foundations_1971, gonzales_additive_1996, bouyssou_consolidated_2015}, this will be important in conjuction with the approach for building \acp{AR} on the basis of such models as exposed in \cref{sec:princ}.
 
 %Our proposal may strike some readers as related to the field of formal argumentation theory. However, despite us using indeed concepts from argumentation theory such as attack relations between arguments, our goal is fundamentally different than the ones of this literature, as we define a new kind of recommender systems that would aim at predicting which arguments a user will appreciate in order to help her form a deliberated judgment. We are not aware of articles in that literature that are interested in a similar goal. This issue is further commented in another article \citep{cailloux_formal_2018}.
@@ -156,7 +157,10 @@ We want to find $\{w_i^c, i \in I, c \in \allcrits\}, \{\alpha^c, c \in \allcrit
 \end{equation}
 We force $w^c_i$ and $\alpha^c$ positive to respect the preference direction: we assume the data is encoded so that higher $b^c(j)$ means preferred performance.
 
-This is now a classical learning task that can be achieved by classical means. \commentOC{Florian: perhaps say (in one sentence?) what we do here, with a reference if appropriate? Also relate to \citet{johnson_logistic_2014}.}
+Being formulated as an optimization problem, it can be solved using a classical algorithm (like Adam optimizer).
+
+Note that, although using a logit function, our formulation is different from \citet{johnson_logistic_2014}, as our formulation relies on a MAVT framework and enables us to estimate a score.
+%This is now a classical learning task that can be achieved by classical means. \commentOC{Florian: perhaps say (in one sentence?) what we do here, with a reference if appropriate? Also relate to \citet{johnson_logistic_2014}.}
 
 We define the partial value functions $v^c_i$ and aggregated value function $v_i$ representing our estimation of the deliberated preferences of user $i$ as $v_i^c(j) = \sigma(\alpha^c, \beta^c, b^c(j))$ and $v_i(j) = \sum_{c \in \allcrits} w_i^c v_i^c(j)$.
 
