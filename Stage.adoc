@@ -1,0 +1,17 @@
+= Stage 
+
+Dans le cadre du mouvement Explainable AI, plusieurs propositions de systèmes de recommandation sont sorties récemment qui ajoutent aux systèmes classiques une capacité d’expliquer leur recommandation.
+
+D’autre part, une proposition récente suggère de produire des systèmes de recommandation capables de dialoguer entre eux, en s’envoyant des arguments en faveurs de différentes recommandations et en attaquant les arguments produits par d’autres systèmes avec des contre-arguments. Alors qu’habituellement les systèmes de recommandation sont jugés à leurs capacité à prédire l’objet qui par ailleurs semble adéquat à l’utilisateur pour des raisons intuitives, le meilleur système de recommandation, dans un tel schéma nouvellement introduit, serait celui qui remporterait le débat, le juge étant l’utilisateur lui-même, et ainsi pourrait amener l’utilisateur vers des choix qu’il n’aurait pas envisagé a priori. 
+
+Ainsi, de tels systèmes de recommandation seraient capables d’éclairer l’utilisateur et de l’enrichir d’arguments éventuellement originaux, mais surtout, seraient utilisés dans un environnement où d’autres concepteurs pourraient concevoir des contre-arguments aux arguments initiaux. Cela pourrait réduire les risques que des systèmes de recommandation orientent les utilisateurs, sous couvert d’apparente neutralité, vers des options qui seraient par exemple favorables au vendeur plutôt qu’à l’acheteur.
+
+L’objectif du stage serait de modifier des propositions existantes de systèmes de recommandation accompagnés d’explication, ou d’en créer de nouveaux, en vue de créer un ou plusieurs couples de systèmes capables de débattre entre eux.
+
+== Références
+* Zhang, Y., Lai, G., Zhang, M., Zhang, Y., Liu, Y. and Ma, S. 2014. “Explicit Factor Models for Explainable Recommendation Based on Phrase-level Sentiment Analysis”. In Proceedings of the 37th International ACM SIGIR Conference on Research & Development in Information Retrieval, SIGIR ’14, pages 83–92, New York, NY, USA. ACM. doi:link:https://doi.org/10.1145/2600428.2609579[10.1145/2600428.2609579].
+* Marx, P., Hennig-Thurau, T. and Marchand, A. 2010. “Increasing Consumers’ Understanding of Recommender Results: A Preference-based Hybrid Algorithm with Strong Explanatory Power”. In Proceedings of the Fourth ACM Conference on Recommender Systems, RecSys ’10, pages 297–300, New York, NY, USA. ACM. doi:link:https://doi.org/10.1145/1864708.1864771[10.1145/1864708.1864771].
+* Cailloux, Olivier. 2018. “Learning argumentative recommenders”. From Decision Aiding to Preference Learning, 2018. https://da2pl.cs.put.poznan.pl/programme/detailed-programme/da2pl2018-abstract-09.pdf[PDF]
+* Cailloux, Olivier and Yves Meinard. 2018. “A formal framework for deliberated judgment”. arxiv:link:http://arxiv.org/abs/1801.05644[1801.05644] [cs.AI]. 
+* Zhang, Y. and Chen, X. 2018. “Explainable recommendation: A survey and new perspectives”. CoRR, arxiv:link:http://arxiv.org/abs/1804.11192[1804.11192].
+
