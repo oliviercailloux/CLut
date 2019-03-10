@@ -1,12 +1,40 @@
-= Stage 
+= Stage en Apprentissage statistique: Dialogue entre systèmes de recommandation
+Olivier Cailloux; Florian Yger
+:keywords: machine learning, artificial intelligence, computational social choice, decision theory, axiomatic analysis, preference elicitation, preference modeling, formal argumentation theory
+//:bibliography-database: Voting-PhD.bib
+//:bibliography-style: apa-note
+//Disables the title page
+ifdef::backend-pdf[:notitle:]
 
-Dans le cadre du mouvement Explainable AI, plusieurs propositions de systèmes de recommandation sont sorties récemment qui ajoutent aux systèmes classiques une capacité d’expliquer leur recommandation.
+ifdef::backend-pdf[]
+[discrete]
+= Stage en Apprentissage statistique: Dialogue entre systèmes de recommandation
+endif::[]
+
+Proposition de stage de Master 2 visant à produire des systèmes de recommandation basés sur du filtrage collaboratif capables d’échanger des arguments en vue d’éclairer un utilisateur sur les atouts de différentes recommandations.
+
+ifndef::backend-pdf[]
+Cet appel est également disponible en https://github.com/oliviercailloux/CLut/raw/master/Stage.pdf[PDF].
+endif::[]
+
+ifdef::backend-pdf[]
+Voir cet appel https://github.com/oliviercailloux/CLut/blob/master/Stage.adoc[sur le web].
+endif::[]
+
+Dans le cadre du mouvement Explainable AI, plusieurs propositions de systèmes de recommandation sont sorties récemment, dans le domaine du filtrage collaboratif (partie de l’apprentissage statistique), qui ajoutent aux systèmes classiques une capacité d’expliquer leur recommandation.
 
 D’autre part, une proposition récente suggère de produire des systèmes de recommandation capables de dialoguer entre eux, en s’envoyant des arguments en faveurs de différentes recommandations et en attaquant les arguments produits par d’autres systèmes avec des contre-arguments. Alors qu’habituellement les systèmes de recommandation sont jugés à leurs capacité à prédire l’objet qui par ailleurs semble adéquat à l’utilisateur pour des raisons intuitives, le meilleur système de recommandation, dans un tel schéma nouvellement introduit, serait celui qui remporterait le débat, le juge étant l’utilisateur lui-même, et ainsi pourrait amener l’utilisateur vers des choix qu’il n’aurait pas envisagé a priori. 
 
 Ainsi, de tels systèmes de recommandation seraient capables d’éclairer l’utilisateur et de l’enrichir d’arguments éventuellement originaux, mais surtout, seraient utilisés dans un environnement où d’autres concepteurs pourraient concevoir des contre-arguments aux arguments initiaux. Cela pourrait réduire les risques que des systèmes de recommandation orientent les utilisateurs, sous couvert d’apparente neutralité, vers des options qui seraient par exemple favorables au vendeur plutôt qu’à l’acheteur.
 
-L’objectif du stage serait de modifier des propositions existantes de systèmes de recommandation accompagnés d’explication, ou d’en créer de nouveaux, en vue de créer un ou plusieurs couples de systèmes capables de débattre entre eux.
+L’objectif du stage est de modifier des propositions existantes de systèmes de recommandation accompagnés d’explication, ou d’en créer de nouveaux, en vue de créer un ou plusieurs couples de systèmes capables de débattre entre eux.
+
+== Contact et informations pratiques
+La proposition concerne un stage de Master 2 d’environ six mois, assorti de la gratification légale habituelle (environ 546 € par mois).
+
+Il aura lieu à l’Université Paris-Dauphine, au http://lamsade.dauphine.fr/[LAMSADE]. 
+
+Encadrants : mailto:olivier.cailloux@dauphine.fr[Olivier Cailloux], MCF, LAMSADE; Florian Yger, MCF, LAMSADE.
 
 == Références
 * Zhang, Y., Lai, G., Zhang, M., Zhang, Y., Liu, Y. and Ma, S. 2014. “Explicit Factor Models for Explainable Recommendation Based on Phrase-level Sentiment Analysis”. In Proceedings of the 37th International ACM SIGIR Conference on Research & Development in Information Retrieval, SIGIR ’14, pages 83–92, New York, NY, USA. ACM. doi:link:https://doi.org/10.1145/2600428.2609579[10.1145/2600428.2609579].
