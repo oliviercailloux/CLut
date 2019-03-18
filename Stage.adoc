@@ -30,7 +30,7 @@ Ainsi, de tels systèmes de recommandation seraient capables d’éclairer l’u
 L’objectif du stage est de modifier des propositions existantes de systèmes de recommandation accompagnés d’explication, ou d’en créer de nouveaux, en vue de créer un ou plusieurs couples de systèmes capables de débattre entre eux.
 
 == Contact et informations pratiques
-La proposition concerne un stage de Master 2 d’environ six mois, assorti de la gratification légale habituelle (environ 546 € par mois).
+La proposition concerne un stage de Master 2 de trois à six mois, assorti de la gratification légale habituelle (environ 546 € par mois).
 
 Il aura lieu à l’Université Paris-Dauphine, au http://lamsade.dauphine.fr/[LAMSADE]. 
 
